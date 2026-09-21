@@ -76,6 +76,16 @@ class OwnerDashboardController extends Controller
         ));
     }
 
+    public function kartu()
+    {
+        $user = auth()->user();
+
+        // Ambil kendaraan milik user yang sedang login (ambil data pertama)
+        $kendaraan = \App\Models\Kendaraan::where('user_id', $user->id)->first();
+
+        return view('dashboard.owner.kartu', compact('user', 'kendaraan'));
+    }
+
     public function stats()
     {
         $user = auth()->user();

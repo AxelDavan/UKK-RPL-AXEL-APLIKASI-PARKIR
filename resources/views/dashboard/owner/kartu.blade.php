@@ -107,17 +107,17 @@
           <span class="text-sm font-bold text-slate-800 font-heading">{{ auth()->user()->name ?? 'Rendra' }}</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="grid grid-cols-2 gap-3 pt-1">
           <div>
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Kendaraan</span>
             <span class="text-xs font-semibold text-slate-700 block mt-0.5">
-              {{ $kendaraan->merk_kendaraan ?? 'Honda Vario 150' }}
+              {{ $kendaraan->merk ?? 'Belum ada kendaraan' }}
             </span>
           </div>
           <div>
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Plat Nomor</span>
             <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-800 tracking-wider inline-block mt-0.5">
-              {{ $kendaraan->nomor_plat ?? 'AB 6517 RN' }}
+              {{ $kendaraan->nomor_plat ?? '-' }}
             </span>
           </div>
         </div>

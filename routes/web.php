@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
 // OWNER (RESIDEN) ROUTES
 Route::middleware(['auth'])->group(function () {
     Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
+    Route::get('/owner/kartu', [OwnerDashboardController::class, 'kartu'])->name('owner.kartu');
     Route::get('/owner/dashboard/stats', [OwnerDashboardController::class, 'stats'])->name('owner.dashboard.stats');
 
     Route::get('/pemesanan', [PemesananController::class, 'index'])->name('pemesanan');
