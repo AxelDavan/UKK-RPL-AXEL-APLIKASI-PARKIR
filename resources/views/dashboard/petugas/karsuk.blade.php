@@ -1,10 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Safe Park - Buat Karcis &amp; Input Plat</title>
-<!-- Google Fonts & Material Symbols -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -29,17 +27,14 @@
       display: none;
     }
     @media print {
-    /* 1. Sembunyikan seluruh isi halaman web */
     body * {
         visibility: hidden;
     }
 
-    /* 2. Tampilkan HANYA kartu struk karcis (#thermalReceipt) dan respondsisinya */
     #thermalReceipt, #thermalReceipt * {
         visibility: visible;
     }
 
-    /* 3. Atur posisi struk ke paling atas kiri agar pas di kertas thermal 80mm */
     #thermalReceipt {
         position: absolute;
         left: 0;
@@ -52,13 +47,11 @@
         background: white !important;
     }
 
-    /* 4. Hilangkan margin header & footer bawaan browser/printer */
     @page {
         size: 80mm auto;
         margin: 0;
     }
     @media print {
-    /* Sembunyikan header/footer bawaan browser */
     @page {
         size: 80mm auto;
         margin: 0mm !important;
@@ -69,14 +62,12 @@
         padding: 0 !important;
     }
 
-    /* Sembunyikan teks 'PRATINJAU KARCIS FISIK (80MM)' saat dicetak ke kertas */
     #thermalReceipt > span:first-child {
         display: none !important;
     }
 }
 }
   </style>
-<!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
     tailwind.config = {
@@ -172,9 +163,8 @@
   </script>
 </head>
 <body class="bg-background font-body-md text-on-surface antialiased min-h-screen">
-<!-- ========================================== -->
-<!-- SIDEBAR NAVIGATION                         -->
-<!-- ========================================== -->
+
+<!-- SIDEBAR NAVIGATION -->
 <nav class="hidden md:flex flex-col h-full py-6 w-64 fixed left-0 top-0
             bg-surface-container-low
             border-r border-outline-variant
@@ -194,7 +184,7 @@
     <!-- MENU UTAMA -->
     <div class="flex-1 flex flex-col gap-1">
 
-        <!-- DASHBOARD - AKTIF -->
+        <!-- DASHBOARD -->
         <a
             href="{{ route('dashboard') }}"
             class="flex items-center gap-4
@@ -380,6 +370,14 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
+        <!-- BANTUAN -->
+        <a class="flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary transition-colors" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-lg text-label-lg">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
 
         <!-- LOGOUT -->
         <form
@@ -411,44 +409,11 @@
     </div>
 
 </nav>
-<!-- Content Wrap (pl-72 accounts for fixed sidebar) -->
-<div class="pl-72 flex flex-col min-h-screen">
-<!-- ========================================== -->
-<!-- TOP HEADER                                 -->
-<!-- ========================================== -->
-<header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-outline-variant/30">
-<div class="h-16 w-full px-xl flex items-center justify-between">
-<!-- Breadcrumb & Gate Location -->
-<div class="flex items-center gap-md">
-<span class="material-symbols-outlined text-primary text-[22px]">shield</span>
-<div class="flex items-center gap-xs text-on-surface-variant font-label-lg text-label-lg">
-<span>Terminal Gerbang</span>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="text-on-surface font-semibold">Pos Jaga Safe Park</span>
-</div>
-</div>
-<!-- Meta Info & User Profile -->
-<div class="flex items-center gap-lg">
-<div class="text-right text-xs font-medium text-slate-600 flex items-center gap-2">
-    <span class="material-symbols-outlined text-[18px] text-slate-400">schedule</span>
-    <span id="header-date"></span> 
-    <span class="text-slate-300">|</span> 
-    <span id="header-clock" class="font-mono font-bold text-slate-800"></span> WIB
-</div>
-<div class="flex items-center gap-xs px-md py-xs rounded-full bg-[#16a34a]/10 text-[#16a34a] font-label-md text-label-md font-semibold">
-<span>Terminal Gerbang</span>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="text-on-surface font-semibold">Pos Jaga Safe Park</span>
-</div>
-<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
-</div>
-</div>
-</div>
-</header>
-<!-- ========================================== -->
-<!-- MAIN WORKSPACE                             -->
-<!-- ========================================== -->
 
+<!-- Content Wrap -->
+<div class="pl-72 flex flex-col min-h-screen">
+
+<!-- MAIN WORKSPACE -->
 <main class="w-full pt-16 flex-1 bg-background p-xl">
 @if(session('error'))
     <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl font-bold">
@@ -466,7 +431,6 @@
     </div>
 @endif
 <div class="flex flex-col w-full">
-<!-- Workspace Title & Hardware Status -->
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-md mb-xl">
 <div class="flex flex-col">
 <div class="flex items-center gap-xs text-on-surface-variant font-label-md text-label-md uppercase tracking-wider mb-xs">
@@ -479,7 +443,6 @@
               Penerbitan karcis fisik mandiri sekaligus pencatatan nomor plat kendaraan tamu masuk dalam satu langkah cepat.
             </p>
 </div>
-<!-- Dispenser Hardware Live Status -->
 <div class="flex items-center gap-sm px-md py-sm bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/30 self-start md:self-center">
 <span class="relative flex h-3 w-3">
 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -492,11 +455,8 @@
 <span class="material-symbols-outlined text-emerald-600 ml-xs text-[20px]">print</span>
 </div>
 </div>
-<!-- ========================================== -->
-<!-- METRICS & STATUS CARDS                     -->
-<!-- ========================================== -->
+
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-md mb-xl">
-<!-- Parking Slot Availability -->
 <div class="p-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between gap-md border border-outline-variant/30">
     <div class="flex items-start justify-between">
         <div class="flex items-center gap-md">
@@ -508,29 +468,25 @@
                 <span class="font-label-md text-label-md text-primary font-semibold">Ground Floor &amp; Basement</span>
             </div>
         </div>
-        <!-- Persentase Kosong Dinamis -->
         <span class="px-sm py-xs rounded-full bg-primary/10 text-primary font-label-md text-label-md font-semibold shrink-0" id="slotPersenText">
             {{ $persenKosong ?? 0 }}% Kosong
         </span>
     </div>
     <div class="flex flex-col gap-xs">
         <div class="flex items-baseline gap-xs">
-            <!-- Jumlah Slot Tersedia Khusus Tamu -->
             <span class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight" id="slotTersediaText">
                 {{ $parkirTerisi }}
             </span>
-            <!-- Total Kapasitas Slot Tamu -->
             <span class="font-title-md text-title-md text-on-surface-variant font-normal" id="slotTotalText">
                 / {{ $totalSlotTamu ?? 150 }} Slot
             </span>
         </div>
-        <!-- Dynamic Progress Bar -->
         <div class="w-full bg-surface-container rounded-full h-2 overflow-hidden">
             <div class="bg-primary-container h-2 rounded-full transition-all duration-500" id="slotProgressBar" style="width: {{ $persenKosong ?? 0 }}%;"></div>
         </div>
     </div>
 </div>
-<!-- Barrier Gate Status -->
+
 <div class="p-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between gap-md border border-outline-variant/30">
 <div class="flex items-start justify-between">
 <div class="flex items-center gap-md">
@@ -556,21 +512,18 @@
 </div>
 </div>
 </div>
-<!-- Main Form & Thermal Preview Grid (12 Columns) -->
+
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-xl items-start">
-<!-- ========================================== -->
-<!-- TICKET & PLATE INPUT FORM                  -->
-<!-- ========================================== -->
 <div class="lg:col-span-7 flex flex-col gap-lg">
 <div class="bg-surface-container-lowest rounded-xl p-lg shadow-sm border border-outline-variant/30 flex flex-col gap-lg relative overflow-hidden">
 <div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-full blur-2xl pointer-events-none"></div>
-<!-- 1. SELIPKAN TAG FORM & INPUT HIDDEN DI SINI -->
+
 <form action="{{ route('karsuk.store') }}" method="POST" id="formKarcis">
     @csrf
     <input type="hidden" name="jenis_kendaraan" id="inputJenisKendaraan" value="mobil">
     <input type="hidden" name="kategori" value="Parkir Tamu (Non-Undangan)">
     <input type="hidden" name="nomor_karcis" value="{{ $nomorKarcisBerikutnya ?? 'A-00001' }}">
-<!-- Form Header -->
+
 <div class="flex items-center justify-between border-b border-outline-variant/40 pb-md">
 <div class="flex items-center gap-sm">
 <span class="material-symbols-outlined text-primary text-[24px]">assignment</span>
@@ -580,7 +533,7 @@
                   Pos Utama - Gate 01
                 </span>
 </div>
-<!-- Ticket Number Banner -->
+
 <div class="flex items-center justify-between p-md bg-surface-container-low rounded-xl border border-outline-variant/20">
 <div class="flex flex-col">
 <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider font-semibold">NOMOR KARCIS BERIKUTNYA</span>
@@ -594,31 +547,28 @@
 <span class="font-label-md text-label-md text-on-surface-variant">Seri Harian Pos Utama</span>
 </div>
 </div>
-<!-- Vehicle Type Selector -->
+
 <div class="flex flex-col gap-sm">
 <label class="font-label-lg text-label-lg text-on-surface flex items-center justify-between">
 <span class="font-semibold">Jenis Kendaraan Tamu</span>
 <span class="text-on-surface-variant font-label-md text-label-md">Pilih Tarif &amp; Akses Jalur</span>
 </label>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-sm" id="vehicleSelector">
-<!-- Mobil Pribadi (Active) -->
 <button class="vehicle-pill flex items-center justify-center gap-sm py-md px-sm rounded-xl font-label-lg text-label-lg transition-all shadow-sm bg-primary-container text-on-primary-container font-semibold" data-type="mobil" type="button">
 <span class="material-symbols-outlined text-[20px]">directions_car</span>
 <span class="text-left leading-tight">Mobil Pribadi<br/><span class="text-[10px] font-normal opacity-90">Tarif Reguler</span></span>
 </button>
-<!-- Sepeda Motor -->
 <button class="vehicle-pill flex items-center justify-center gap-sm py-md px-sm rounded-xl bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all font-label-lg text-label-lg" data-type="motor" type="button">
 <span class="material-symbols-outlined text-[20px]">two_wheeler</span>
 <span class="text-left leading-tight">Sepeda Motor<br/><span class="text-[10px] font-normal opacity-75">Tarif Roda 2</span></span>
 </button>
-<!-- Operasional / Logistik -->
 <button class="vehicle-pill flex items-center justify-center gap-sm py-md px-sm rounded-xl bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all font-label-lg text-label-lg" data-type="logistik" type="button">
 <span class="material-symbols-outlined text-[20px]">local_shipping</span>
 <span class="text-left leading-tight">Operasional / Logistik<br/><span class="text-[10px] font-normal opacity-75">Akses Khusus</span></span>
 </button>
 </div>
 </div>
-<!-- License Plate Input Field -->
+
 <div class="flex flex-col gap-sm">
 <div class="flex items-center justify-between">
 <label class="font-label-lg text-label-lg text-on-surface flex items-center gap-xs font-semibold" for="plateInput">
@@ -636,7 +586,7 @@
 </button>
 </div>
 </div>
-<!-- Locked Category / Host Section -->
+
 <div class="flex flex-col gap-xs p-md bg-surface-container-low rounded-xl border border-dashed border-outline-variant/60">
 <div class="flex items-center justify-between">
 <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider font-semibold">KATEGORI / TUAN RUMAH</span>
@@ -648,7 +598,7 @@
 </div>
 <span class="font-label-md text-label-md text-on-secondary-container mt-xs">Akses Publik Terbatas • Gate 01</span>
 </div>
-<!-- Action Buttons -->
+
 <div class="flex flex-col sm:flex-row items-center gap-md pt-md border-t border-outline-variant/40">
     <button class="w-full sm:flex-1 flex items-center justify-center gap-sm py-md px-lg rounded-xl text-white shadow-md transition-all active:scale-[0.99] bg-primary hover:bg-primary-container" id="printTicketBtn" type="submit">
         <span class="material-symbols-outlined text-[24px]">print</span>
@@ -662,9 +612,7 @@
 </div>
 </form>
 </div>
-<!-- ========================================== -->
-<!-- SOP OPERATIONAL GUIDE                      -->
-<!-- ========================================== -->
+
 <div class="bg-surface-container-lowest rounded-xl p-lg shadow-sm border border-outline-variant/30 flex flex-col gap-md">
 <div class="flex items-center gap-sm">
 <div class="w-8 h-8 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
@@ -676,7 +624,6 @@
 </div>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-md pt-xs">
-<!-- Step 1 -->
 <div class="flex items-start gap-sm p-sm rounded-lg bg-surface-container-low border border-outline-variant/20">
 <span class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-label-lg text-label-lg font-bold shrink-0">
                     1
@@ -685,7 +632,6 @@
                     Periksa plat nomor dari kamera ANPR atau ketik langsung jika belum terbaca.
                   </p>
 </div>
-<!-- Step 2 -->
 <div class="flex items-start gap-sm p-sm rounded-lg bg-surface-container-low border border-outline-variant/20">
 <span class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-label-lg text-label-lg font-bold shrink-0">
                     2
@@ -694,7 +640,6 @@
                     Tekan 'Cetak Karcis &amp; Proses Masuk' untuk cetak karcis &amp; buka barrier gate otomatis.
                   </p>
 </div>
-<!-- Step 3 -->
 <div class="flex items-start gap-sm p-sm rounded-lg bg-surface-container-low border border-outline-variant/20">
 <span class="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-label-lg text-label-lg font-bold shrink-0">
                     3
@@ -706,11 +651,8 @@
 </div>
 </div>
 </div>
-<!-- ========================================== -->
-<!-- THERMAL TICKET PREVIEW                     -->
-<!-- ========================================== -->
+
 <div class="lg:col-span-5 flex flex-col items-center">
-<!-- Simulated Jagged Tear Edge -->
 <div class="w-80 h-3 flex justify-between overflow-hidden opacity-30">
 <div class="w-full flex">
 <div class="w-2 h-2 rotate-45 bg-surface-container-highest -mt-1 mx-0.5 shrink-0"></div>
@@ -731,20 +673,19 @@
 <div class="w-2 h-2 rotate-45 bg-surface-container-highest -mt-1 mx-0.5 shrink-0"></div>
 </div>
 </div>
-<!-- 80mm Physical Thermal Ticket Card -->
+
 <div class="w-80 bg-surface-container-lowest p-lg rounded-xl shadow-lg border border-outline-variant/30 flex flex-col items-center text-center transition-all duration-300" id="thermalReceipt">
 <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-xs font-semibold">
                 PRATINJAU KARCIS FISIK (80MM)
               </span>
-<!-- Logo & Header -->
 <div class="flex items-center gap-xs mb-xs">
 <span class="font-title-md text-title-md font-bold text-on-surface tracking-tighter">PARKIR SAFE PARK</span>
 </div>
 <span class="font-label-md text-label-md font-bold text-on-surface">POS GERBANG MASUK UTAMA</span>
 <span class="font-label-md text-label-md text-on-surface-variant">Apartemen Terpadu Tower Gardenia</span>
-<!-- Dotted Divider -->
+
 <div class="w-full my-md border-b border-dashed border-outline-variant/80"></div>
-<!-- Ticket ID -->
+
 <div class="flex flex-col items-center">
 <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider font-semibold">NOMOR BUKTI PARKIR</span>
 <span class="font-display-lg text-display-lg font-bold text-on-surface tracking-tight my-xs" id="previewTicketId">{{ $nomorKarcisBerikutnya }}</span>
@@ -752,9 +693,9 @@
                   KENDARAAN: MOBIL PRIBADI
                 </span>
 </div>
-<!-- Dotted Divider -->
+
 <div class="w-full my-md border-b border-dashed border-outline-variant/80"></div>
-<!-- Timestamp & Plate Info List -->
+
 <div class="w-full flex flex-col gap-xs text-left">
 <div class="flex justify-between items-center">
 <span class="font-label-md text-label-md text-on-surface-variant">Nomor Plat:</span>
@@ -777,7 +718,7 @@
 <span class="font-label-md text-label-md text-on-surface font-semibold">Gate 01 (IN-01)</span>
 </div>
 </div>
-<!-- Barcode Mockup -->
+
 <div class="w-full my-md flex flex-col items-center gap-xs">
 <div class="w-full flex justify-center items-center gap-[2px] h-8 px-md mt-xs">
 <span class="w-[2px] h-full bg-on-surface"></span>
@@ -804,9 +745,9 @@
 </div>
 <span class="font-label-md text-label-md text-on-surface tracking-widest font-mono font-semibold">{{ $nomorKarcisBerikutnya }}</span>
 </div>
-<!-- Dotted Divider -->
+
 <div class="w-full my-xs border-b border-dashed border-outline-variant/80"></div>
-<!-- Parking Regulations Disclaimer -->
+
 <div class="flex flex-col gap-xs text-[10px] leading-tight text-on-surface-variant text-center px-xs py-xs">
 <p class="font-bold text-on-surface">PERHATIAN &amp; PERATURAN PARKIR:</p>
 <p>1. Tiket ini merupakan tanda bukti parkir yang sah.</p>
@@ -815,7 +756,7 @@
 <p class="font-bold text-on-surface mt-xs tracking-wider">SIMPAN TIKET INI HINGGA KELUAR GERBANG</p>
 </div>
 </div>
-<!-- Success Notification Toast (Interactive) -->
+
 <div class="hidden mt-md w-80 p-md bg-emerald-700 text-white rounded-xl shadow-md flex items-center gap-sm transition-all duration-300" id="printSuccessToast">
 <span class="material-symbols-outlined text-[24px]">check_circle</span>
 <div class="flex flex-col">
@@ -827,9 +768,7 @@
 </div>
 </div>
 </main>
-<!-- ========================================== -->
-<!-- BOTTOM STATUS FOOTER                       -->
-<!-- ========================================== -->
+
 <footer class="w-full bg-surface-container-lowest shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-md border-t border-outline-variant/30">
 <div class="w-full px-xl flex items-center justify-between font-label-md text-label-md text-on-surface-variant">
 <span>© 2024 Safe Park Pos Jaga. Apartemen Terpadu.</span>
@@ -840,6 +779,8 @@
 </div>
 </footer>
 </div>
+
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -853,7 +794,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const vehicleButtons      = document.querySelectorAll('.vehicle-pill');
     const formKarcis          = document.getElementById('formKarcis');
 
-    // 2. LIVE PREVIEW PLAT NOMOR (Ketikan Otomatis Kapital)
+    // 2. LIVE PREVIEW PLAT NOMOR
     if (plateInput && previewPlate) {
         plateInput.addEventListener('input', function () {
             const val = this.value.toUpperCase();
@@ -865,13 +806,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // 3. LIVE PREVIEW JENIS KENDARAAN
     vehicleButtons.forEach(button => {
         button.addEventListener('click', function () {
-            // Reset style tombol lain
             vehicleButtons.forEach(b => {
                 b.classList.remove('bg-primary-container', 'text-on-primary-container', 'font-semibold');
                 b.classList.add('bg-surface-container', 'text-on-surface-variant');
             });
 
-            // Set style tombol aktif
             this.classList.remove('bg-surface-container', 'text-on-surface-variant');
             this.classList.add('bg-primary-container', 'text-on-primary-container', 'font-semibold');
 
@@ -905,8 +844,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 6. SUBMIT FORM & PENCETAKAN STRUK
-    // Ganti bagian listener submit form menjadi sederhana seperti ini:
+    // 6. SUBMIT FORM
     if (formKarcis) {
         formKarcis.addEventListener('submit', function (e) {
             if (!plateInput.value.trim()) {
@@ -914,7 +852,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Harap isi nomor plat kendaraan terlebih dahulu!');
                 plateInput.focus();
             }
-            // Biarkan form tersubmit secara alami ke controller
         });
     }
 
@@ -937,7 +874,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateHeaderClock();
     setInterval(updateHeaderClock, 1000);
 
-    // 8. WAKTU MASUK REAL-TIME PADA STRUK
+    // 8. WAKTU MASUK REAL-TIME STRUK
     function updatePreviewTime() {
         const now = new Date();
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -957,6 +894,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
     updatePreviewTime();
     setInterval(updatePreviewTime, 1000);
+
+    // 9. NOTIFIKASI BANTUAN REAL-TIME
+    const bantuanBadge = document.getElementById('bantuanBadge');
+    const notifSound = document.getElementById('notifSound');
+    let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+    async function checkNewMessages() {
+      try {
+        const response = await fetch("{{ route('admin.bantuan.users') }}");
+        if (!response.ok) return;
+
+        const users = await response.json();
+
+        if (users.length > 0) {
+          let latestChatId = 0;
+          users.forEach(u => {
+            if (u.last_chat_id > latestChatId) {
+              latestChatId = u.last_chat_id;
+            }
+          });
+
+          if (latestChatId > lastChatId) {
+            if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+            if (notifSound) {
+              notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            lastChatId = latestChatId;
+            localStorage.setItem('last_seen_chat_id', lastChatId);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengecek notifikasi pesan:", err);
+      }
+    }
+
+    setInterval(checkNewMessages, 3000);
 });
 </script>
 </body></html>

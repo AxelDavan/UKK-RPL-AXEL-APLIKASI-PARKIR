@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('transaksi_parkirs', function (Blueprint $table) {
-            $table->unsignedBigInteger('tamu_id')->nullable()->after('user_id');
+        Schema::table('pemesanans', function (Blueprint $table) {
+            $table->unsignedBigInteger('kendaraan_id')->nullable()->after('slot_parkir_id');
         });
     }
-    
+
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::table('transaksi_parkirs', function (Blueprint $table) {
-            $table->dropForeign(['tamu_id']);
-            $table->dropColumn('tamu_id');
+        Schema::table('pemesanans', function (Blueprint $table) {
+            //
         });
     }
 };

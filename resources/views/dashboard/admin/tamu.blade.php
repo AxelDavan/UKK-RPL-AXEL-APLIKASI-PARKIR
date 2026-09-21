@@ -313,21 +313,21 @@
 
         <ul class="space-y-1">
 
-            <!-- Bantuan -->
+            <!-- Profile -->
             <li>
                 <a
-                    href="#"
+                    href="{{ route('profile.edit') }}"
                     class="flex items-center gap-3 px-6 py-3
                            text-on-surface-variant
                            hover:bg-surface-container
                            transition-colors"
                 >
                     <span class="material-symbols-outlined">
-                        help
+                        person
                     </span>
 
                     <span class="font-body-sm text-body-sm">
-                        Bantuan
+                        Profile
                     </span>
                 </a>
             </li>
@@ -365,10 +365,13 @@
 </div>
 <!-- Top Action Buttons -->
 <div class="flex items-center gap-2.5 self-start md:self-auto">
-<button class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl transition-all shadow-xs hover:border-slate-300" id="btnExport">
-<span class="material-symbols-outlined text-slate-500 text-[18px]">download</span>
-<span class="">Export Data</span>
-<span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono font-medium">CSV/XLS</span>
+<button type="button" 
+        onclick="exportTableToCSV('data_pengunjung_safepark.csv')" 
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl transition-all shadow-xs hover:border-slate-300" 
+        id="btnExport">
+    <span class="material-symbols-outlined text-slate-500 text-[18px]">download</span>
+    <span>Export Data</span>
+    <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono font-medium">CSV/XLS</span>
 </button>
 
 </div>
@@ -470,17 +473,17 @@
             
             <a href="{{ route('tamu') }}" 
                class="px-3 py-1 rounded-full font-medium transition-colors {{ !request('status') ? 'bg-primary-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600' }}">
-                Semua ({{ $sedangBerkunjung + $sudahCheckout }})
+                Semua
             </a>
 
             <a href="{{ route('tamu', ['status' => 'checked-in', 'search' => request('search')]) }}" 
                class="px-3 py-1 rounded-full font-medium transition-colors {{ request('status') === 'checked-in' ? 'bg-primary-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600' }}">
-                Sedang Berkunjung ({{ $sedangBerkunjung }})
+                Sedang Berkunjung
             </a>
 
             <a href="{{ route('tamu', ['status' => 'checked-out', 'search' => request('search')]) }}" 
                class="px-3 py-1 rounded-full font-medium transition-colors {{ request('status') === 'checked-out' ? 'bg-primary-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600' }}">
-                Check-Out ({{ $sudahCheckout }})
+                Check-Out
             </a>
         </div>
     </form>
@@ -530,12 +533,10 @@
         </div>
     </td>
     <td class="py-3.5 px-4">
-        <!-- Cek apakah nama mengandung Karcis, user_id null, atau dibuat oleh petugas -->
         @if(str_contains(strtolower($tamu->nama_tamu ?? ''), 'karcis') || is_null($tamu->user_id) || ($tamu->user && $tamu->user->role === 'petugas'))
             <div class="font-semibold text-slate-900">Walk-in / Karcis</div>
             <div class="text-xs text-slate-500 font-medium">Unit: Slot Parkir Tamu</div>
         @else
-            <!-- Jika Tamu Undangan QR dari Residen Asli -->
             <div class="font-semibold text-slate-900">{{ $tamu->user->name ?? 'Residen' }}</div>
             <div class="text-xs text-primary-600 font-medium">Unit: {{ $tamu->user->nomor_unit ?? 'Unit Residen' }}</div>
         @endif
@@ -551,7 +552,12 @@
         </div>
     </td>
     <td class="py-3.5 px-4">
-        @if(is_null($tamu->waktu_keluar) || $tamu->status === 'aktif' || $tamu->status === 'di_dalam')
+        @if($tamu->status === 'menunggu')
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Menunggu Kedatangan
+            </span>
+        @elseif($tamu->status === 'di_dalam' || $tamu->status === 'aktif')
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Sedang Berkunjung
@@ -602,6 +608,39 @@
 </div>
 </main>
 </div>
+<script>
+function exportTableToCSV(filename) {
+    let csv = [];
+    let table = document.querySelector("table");
+    if (!table) {
+        alert("Tidak ada data tabel untuk diexport!");
+        return;
+    }
+
+    let rows = table.querySelectorAll("tr");
+
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll("td, th");
+        for (let j = 1; j < cols.length - 1; j++) {
+            let text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, " ").trim();
+            text = text.replace(/"/g, '""');
+            row.push('"' + text + '"');
+        }
+        if (row.length > 0) {
+            csv.push(row.join(","));
+        }
+    }
+
+    let csvFile = new Blob(["\ufeff" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+    let downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+</script>
 </body></html>
 @endif
 
@@ -1007,12 +1046,14 @@
 </div>
 <!-- Top Action Buttons -->
 <div class="flex items-center gap-2.5 self-start md:self-auto">
-<button class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl transition-all shadow-xs hover:border-slate-300" id="btnExport">
-<span class="material-symbols-outlined text-slate-500 text-[18px]">download</span>
-<span class="">Export Data</span>
-<span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono font-medium">CSV/XLS</span>
+<button type="button" 
+        onclick="exportTableToCSV('data_pengunjung_safepark.csv')" 
+        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl transition-all shadow-xs hover:border-slate-300" 
+        id="btnExport">
+    <span class="material-symbols-outlined text-slate-500 text-[18px]">download</span>
+    <span>Export Data</span>
+    <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono font-medium">CSV/XLS</span>
 </button>
-
 </div>
 </div>
 <!-- METRIC CARDS -->
@@ -1112,17 +1153,17 @@
             
             <a href="{{ route('tamu') }}" 
                class="px-3 py-1 rounded-full font-medium transition-colors {{ !request('status') ? 'bg-primary-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600' }}">
-                Semua ({{ $sedangBerkunjung + $sudahCheckout }})
+                Semua
             </a>
 
             <a href="{{ route('tamu', ['status' => 'checked-in', 'search' => request('search')]) }}" 
                class="px-3 py-1 rounded-full font-medium transition-colors {{ request('status') === 'checked-in' ? 'bg-primary-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600' }}">
-                Sedang Berkunjung ({{ $sedangBerkunjung }})
+                Sedang Berkunjung
             </a>
 
             <a href="{{ route('tamu', ['status' => 'checked-out', 'search' => request('search')]) }}" 
                class="px-3 py-1 rounded-full font-medium transition-colors {{ request('status') === 'checked-out' ? 'bg-primary-600 text-white shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600' }}">
-                Check-Out ({{ $sudahCheckout }})
+                Check-Out
             </a>
         </div>
     </form>
@@ -1172,12 +1213,10 @@
         </div>
     </td>
     <td class="py-3.5 px-4">
-        <!-- Cek apakah nama mengandung Karcis, user_id null, atau dibuat oleh petugas -->
         @if(str_contains(strtolower($tamu->nama_tamu ?? ''), 'karcis') || is_null($tamu->user_id) || ($tamu->user && $tamu->user->role === 'petugas'))
             <div class="font-semibold text-slate-900">Walk-in / Karcis</div>
             <div class="text-xs text-slate-500 font-medium">Unit: Slot Parkir Tamu</div>
         @else
-            <!-- Jika Tamu Undangan QR dari Residen Asli -->
             <div class="font-semibold text-slate-900">{{ $tamu->user->name ?? 'Residen' }}</div>
             <div class="text-xs text-primary-600 font-medium">Unit: {{ $tamu->user->nomor_unit ?? 'Unit Residen' }}</div>
         @endif
@@ -1193,7 +1232,12 @@
         </div>
     </td>
     <td class="py-3.5 px-4">
-        @if(is_null($tamu->waktu_keluar) || $tamu->status === 'aktif' || $tamu->status === 'di_dalam')
+        @if($tamu->status === 'menunggu')
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Menunggu Kedatangan
+            </span>
+        @elseif($tamu->status === 'di_dalam' || $tamu->status === 'aktif')
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Sedang Berkunjung
@@ -1244,5 +1288,38 @@
 </div>
 </main>
 </div>
+<script>
+function exportTableToCSV(filename) {
+    let csv = [];
+    let table = document.querySelector("table");
+    if (!table) {
+        alert("Tidak ada data tabel untuk diexport!");
+        return;
+    }
+
+    let rows = table.querySelectorAll("tr");
+
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll("td, th");
+        for (let j = 1; j < cols.length - 1; j++) {
+            let text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/\s+/g, " ").trim();
+            text = text.replace(/"/g, '""');
+            row.push('"' + text + '"');
+        }
+        if (row.length > 0) {
+            csv.push(row.join(","));
+        }
+    }
+
+    let csvFile = new Blob(["\ufeff" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+    let downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+</script>
 </body></html>
 @endif

@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AnalitikController;
 use App\Http\Controllers\AreaParkirAdminController;
+use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\BantuanController;
 use App\Http\Controllers\KarcisKeluarController;
 use App\Http\Controllers\KarcisMasukController;
 use App\Http\Controllers\KendaaranAdminController;
@@ -17,6 +19,9 @@ use App\Http\Controllers\PemesananController;
 use App\Http\Controllers\PenggunaAdminController;
 use App\Http\Controllers\PetugasDashboardController;
 use App\Http\Controllers\StatusPaymentController;
+use App\Models\Kendaraan;
+use App\Models\Tamu;
+use Illuminate\Http\Request;
 use App\Http\Controllers\TamuController;
 use App\Http\Controllers\TransaksiParkirController;
 use App\Http\Controllers\UserController;
@@ -34,9 +39,16 @@ Route::get('/faq', function () { return view('faq'); });
 // PROFILE & AUTHENTICATION
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/profile/password', function () { return view('profile.partials.update-password-form'); })->name('profile.password');
+    
+    // Arahkan ke file Blade baru khusus profil
+    Route::get('/profile/password', function () { 
+        return view('profile.partials.update-password-form'); 
+    })->name('profile.password');
+
+    Route::put('/profile/password', [PasswordController::class, 'update'])->name('password.update');
 });
 
 // ROLE DASHBOARDS
@@ -101,6 +113,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/kendaraan', [KendaraanOwnerController::class, 'index'])->name('kendaraan');
     Route::get('/api/kendaraan/real-time', [KendaraanOwnerController::class, 'getStatus'])->name('kendaraan.realtime');
+
+    Route::get('/api/kendaraan/unassigned', [KendaraanOwnerController::class, 'getUnassignedVehicles'])->name('kendaraan.unassigned');
     Route::delete('/kendaraan/{id}', [KendaraanOwnerController::class, 'destroy'])->name('kendaraanowner.destroy');
     Route::get('/user/myslots', [KendaraanOwnerController::class, 'getMySlot'])->name('kendaraan.myslot');
     Route::post('/kendaraan/store', [KendaraanOwnerController::class, 'store'])->name('kendaraan.store.ajax');
@@ -110,7 +124,66 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard.owner.invite');
     })->name('invite');
     Route::post('/invite/store', [TamuController::class, 'store'])->name('invite.store');
+    Route::get('/owner/kartu', function () {
+    // Ambil data kendaraan utama milik user yang login
+    $kendaraan = \App\Models\Kendaraan::where('user_id', auth()->id())->first();
+    
+    return view('dashboard.owner.kartu', compact('kendaraan'));
+    })->name('kartu');
+
 });
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/owner/bantuan', [BantuanController::class, 'index'])->name('bantuan');
+    Route::get('/owner/bantuan/get-chats', [BantuanController::class, 'getChats'])->name('bantuan.get');
+    Route::post('/owner/bantuan/kirim-chat', [BantuanController::class, 'kirimChat'])->name('bantuan.kirim');
+});
+
+// Route Chat Admin
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/bantuan', [BantuanController::class, 'adminIndex'])->name('admin.bantuan');
+    Route::get('/admin/bantuan/users', [BantuanController::class, 'getAdminUsers'])->name('admin.bantuan.users');
+    Route::get('/admin/bantuan/chats/{userId}', [BantuanController::class, 'getAdminChats'])->name('admin.bantuan.chats');
+    Route::post('/admin/bantuan/kirim/{userId}', [BantuanController::class, 'kirimAdminChat'])->name('admin.bantuan.kirim');
+});
+
+Route::get('/list-tamu-undangan', function (Request $request) {
+    $userId = auth()->id();
+
+    // Query Tamu milik Owner yang login
+    $query = Tamu::where('user_id', $userId);
+
+    // Filter Search
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('nama_tamu', 'like', '%' . $request->search . '%')
+              ->orWhere('plat_nomor', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    // Filter Status
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    // Metric Cards Count
+    $totalUndangan = Tamu::where('user_id', $userId)->count();
+    $tamuDiDalam = Tamu::where('user_id', $userId)->where('status', 'aktif')->count();
+    $menungguHadir = Tamu::where('user_id', $userId)->where('status', 'menunggu')->count();
+    $kunjunganSelesai = Tamu::where('user_id', $userId)->where('status', 'selesai')->count();
+
+    // Pagination Data
+    $tamus = $query->latest()->paginate(10)->withQueryString();
+
+    return view('dashboard.owner.listinvite', compact(
+        'tamus', 
+        'totalUndangan', 
+        'tamuDiDalam', 
+        'menungguHadir', 
+        'kunjunganSelesai'
+    ));
+})->middleware('auth')->name('list');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/aktivitas', function () {

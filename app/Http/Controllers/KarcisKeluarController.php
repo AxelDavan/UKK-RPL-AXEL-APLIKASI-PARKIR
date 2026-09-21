@@ -85,16 +85,16 @@ class KarcisKeluarController extends Controller
             'karcis_id'   => 'required|exists:karcis_masuks,id',
             'total_biaya' => 'required|numeric',
         ]);
-
+    
         DB::beginTransaction();
         try {
             $karcis = KarcisMasuk::findOrFail($request->karcis_id);
             $waktuKeluar = Carbon::now();
-
-            // Update Karcis Masuk jadi selesai
+    
+            // 1. Update Karcis Masuk jadi selesai
             $karcis->update(['status' => 'selesai']);
-
-            // Update Transaksi Parkir Utama
+    
+            // 2. Update Transaksi Parkir Utama
             if ($karcis->transaksi_parkir_id) {
                 $transaksi = TransaksiParkir::find($karcis->transaksi_parkir_id);
                 if ($transaksi) {
@@ -105,15 +105,27 @@ class KarcisKeluarController extends Controller
                     ]);
                 }
             }
-
+    
+            // 3. TAMBAHKAN INI: Update data Tamu / Pengunjung agar ikut sinkron
+            $tamu = \App\Models\Tamu::where('nomor_plat', $karcis->nomor_plat)
+                ->whereIn('status', ['aktif', 'di_dalam'])
+                ->first();
+                
+            if ($tamu) {
+                $tamu->update([
+                    'status'       => 'selesai', // atau sesuaikan dengan status check-out di tabel tamu ('checked-out' / 'selesai')
+                    'waktu_keluar' => $waktuKeluar,
+                ]);
+            }
+    
             DB::commit();
-
+    
             return response()->json([
                 'status'       => 'success',
                 'message'      => 'Karcis berhasil diproses & Palang Pintu Terbuka!',
                 'nomor_karcis' => $karcis->nomor_karcis
             ]);
-
+    
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([

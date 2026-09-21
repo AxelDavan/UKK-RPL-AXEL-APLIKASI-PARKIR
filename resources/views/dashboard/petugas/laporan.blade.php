@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Safe Park - Laporan</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
@@ -112,57 +110,53 @@
     </style>
 <style>
 @media print {
-
-    /* Sembunyikan sidebar */
-    .print-hidden {
+    /* Sembunyikan Sidebar, Navigasi, dan Form Filter saat dicetak */
+    nav, header, form, .no-print, button {
         display: none !important;
     }
 
-    /* Konten laporan memenuhi halaman */
-    .report-print {
+    /* Paksa Konten Utama Full Lebar */
+    main, .report-print {
         margin: 0 !important;
-        padding: 20px !important;
+        padding: 0 !important;
         width: 100% !important;
+        position: absolute;
+        top: 0;
+        left: 0;
     }
 
-    /* Hilangkan tombol/filter */
-    .report-actions {
-        display: none !important;
+    body {
+        background-color: white !important;
+        color: black !important;
     }
 
-    /* Tabel tetap rapi */
-    .report-table {
+    table {
         width: 100% !important;
         border-collapse: collapse !important;
     }
 
-    .report-table th,
-    .report-table td {
-        border: 1px solid #d1d5db !important;
-        padding: 10px !important;
+    th, td {
+        border: 1px solid #999 !important;
+        padding: 8px !important;
+        font-size: 12px !important;
     }
 
-    /* Jangan tampilkan pagination */
-    .report-pagination {
-        display: none !important;
-    }
-
-    /* Ukuran kertas */
     @page {
         size: A4 landscape;
-        margin: 15mm;
+        margin: 10mm;
     }
 }
 </style>
 </head>
 <body class="bg-background text-on-background flex min-h-screen">
-<!-- TopNavBar (Hidden on md, since SideNavBar takes over for desktop) -->
+
 <header class="md:hidden flex justify-between items-center w-full px-margin-mobile h-16 bg-surface border-b border-outline-variant shadow-sm fixed top-0 z-40">
 <div class="flex gap-sm no-print">
 <span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="notifications">notifications</span>
 <span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="account_circle">account_circle</span>
 </div>
 </header>
+
 <nav class="hidden md:flex flex-col h-full py-6 w-64 fixed left-0 top-0
             bg-surface-container-low
             border-r border-outline-variant
@@ -182,9 +176,8 @@
     <!-- MENU UTAMA -->
     <div class="flex-1 flex flex-col gap-1">
 
-        <!-- DASHBOARD - AKTIF -->
+        <!-- DASHBOARD -->
         <a
-            
             href="{{ route('dashboard') }}"
             class="flex items-center gap-4
                    px-4 py-3 mx-2 rounded-lg
@@ -192,7 +185,7 @@
                    {{ request()->routeIs('dashboard')
                         ? 'bg-secondary-container text-on-secondary-container font-bold'
                         : 'text-on-surface-variant' }}"
-        ></>
+        >
             <span
                 class="material-symbols-outlined"
                 style="font-variation-settings: 'FILL' 1;"
@@ -368,6 +361,15 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
+        <!-- BANTUAN -->
+        <a class="flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary transition-colors" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-lg text-label-lg">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
+
         <!-- LOGOUT -->
         <form
             method="POST"
@@ -398,14 +400,14 @@
     </div>
 
 </nav>
+
 <!-- Main Content Canvas -->
 <main class="flex-1 md:ml-64 pt-16 md:pt-0 p-margin-mobile md:p-margin-desktop bg-background min-h-screen report-print">
-<!-- Header -->
 <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-xl gap-md">
 <div class="flex gap-sm">
 </div>
 </div>
-<!-- Filter Form & Actions -->
+
 <form method="GET" action="{{ route('laporan') }}" class="flex flex-col md:flex-row md:justify-between md:items-end mb-xl gap-md no-print">
     <div>
         <h1 class="font-headline-lg text-headline-lg text-on-background mb-xs">Laporan Aktivitas</h1>
@@ -421,16 +423,15 @@
             <option value="bulan_ini" {{ $filterTanggal == 'bulan_ini' ? 'selected' : '' }}>Bulan Ini</option>
         </select>
 
-        <!-- Filter Aktivitas -->
+        <!-- TARUH DI SINI (Filter Aktivitas yang baru) -->
         <select name="aktivitas" onchange="this.form.submit()" class="px-md py-sm border border-outline-variant rounded-lg bg-surface text-on-surface text-label-lg font-label-lg outline-none cursor-pointer">
             <option value="semua" {{ $filterAktivitas == 'semua' ? 'selected' : '' }}>Semua Aktivitas</option>
-            <option value="kendaraan" {{ $filterAktivitas == 'kendaraan' ? 'selected' : '' }}>Kendaraan</option>
-            <option value="qr" {{ $filterAktivitas == 'qr' ? 'selected' : '' }}>QR Code</option>
-            <option value="verifikasi" {{ $filterAktivitas == 'verifikasi' ? 'selected' : '' }}>Verifikasi</option>
-            <option value="pembayaran" {{ $filterAktivitas == 'pembayaran' ? 'selected' : '' }}>Pembayaran</option>
+            <option value="Masuk" {{ $filterAktivitas == 'Masuk' ? 'selected' : '' }}>Masuk</option>
+            <option value="Keluar" {{ $filterAktivitas == 'Keluar' ? 'selected' : '' }}>Keluar</option>
+            <option value="Verifikasi" {{ $filterAktivitas == 'Verifikasi' ? 'selected' : '' }}>Verifikasi</option>
         </select>
 
-        <!-- Tombol Export/Print -->
+        <!-- Tombol Print / Export -->
         <button type="button" onclick="window.print()" class="flex items-center gap-xs px-md py-sm bg-primary-container text-on-primary-container rounded-lg hover:opacity-90 transition-opacity font-label-lg text-label-lg font-semibold shadow-sm">
             <span class="material-symbols-outlined" style="font-size: 18px;">print</span>
             Export
@@ -438,7 +439,6 @@
     </div>
 </form>
 
-<!-- Activity Table -->
 <div class="bg-surface rounded-xl shadow-sm border border-outline-variant overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse report-table">
@@ -454,7 +454,6 @@
             <tbody class="font-body-md text-body-md text-on-surface">
                 @forelse($logs as $log)
                     @php
-                        // Mapping Icon & Warna Berdasarkan Kategori/Status
                         $icon = match($log->kategori) {
                             'qr'         => 'qr_code',
                             'pembayaran' => 'payments',
@@ -497,9 +496,52 @@
         </table>
     </div>
 
-    <!-- Pagination Links -->
     <div class="px-lg py-sm border-t border-outline-variant bg-surface-container-lowest report-pagination flex items-center justify-between">
         <div>{{ $logs->links() }}</div>
     </div>
 </div>
+</main>
+
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const bantuanBadge = document.getElementById('bantuanBadge');
+    const notifSound = document.getElementById('notifSound');
+    let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+    async function checkNewMessages() {
+      try {
+        const response = await fetch("{{ route('admin.bantuan.users') }}");
+        if (!response.ok) return;
+
+        const users = await response.json();
+
+        if (users.length > 0) {
+          let latestChatId = 0;
+          users.forEach(u => {
+            if (u.last_chat_id > latestChatId) {
+              latestChatId = u.last_chat_id;
+            }
+          });
+
+          if (latestChatId > lastChatId) {
+            if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+            if (notifSound) {
+              notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            lastChatId = latestChatId;
+            localStorage.setItem('last_seen_chat_id', lastChatId);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengecek notifikasi pesan:", err);
+      }
+    }
+
+    setInterval(checkNewMessages, 3000);
+});
+</script>
 </body></html>

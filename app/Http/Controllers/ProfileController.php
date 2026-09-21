@@ -8,8 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -21,40 +19,30 @@ class ProfileController extends Controller
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
-
-        $user = auth()->user();
-
-            return view('profile.edit', compact($user));
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
-        $user = auth()->user();
-
-        $validate = $request->validate([
-            'name' => 'require|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'nomor_telepon' => 'required|string|max:20',
+        $user = $request->user();
+    
+        $validated = $request->validate([
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|max:255|unique:users,email,' . $user->id,
+            'nomor_telepon' => 'nullable|string|max:20',
         ]);
-
-        $user->updated($validate);
-
-        return redirect()->route('profile.edit')->with(
-            'success', 'Profil berhasil diperbarui.'
-        );
-
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    
+        // Update data pribadi TANPA mengubah timestamp/waktu sandi
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->nomor_telepon = $validated['nomor_telepon'];
+        
+        // Pastikan updated_at untuk password tidak tersentuh (kita matikan touch timestamp bawaan jika perlu, atau biarkan pakai kolom terpisah)
+        $user->save();
+    
+        return Redirect::route('profile.edit')->with('success', 'Profil berhasil diperbarui!');
     }
 
     /**
@@ -70,12 +58,11 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete('user requested account deletion');
+        $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
     }
-
 }

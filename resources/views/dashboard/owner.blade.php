@@ -135,7 +135,7 @@
             <span class="material-symbols-outlined">person</span>
             <span class="font-title-md text-title-md">Profile</span>
         </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="#">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
             <span class="material-symbols-outlined">help</span>
             <span class="font-title-md text-title-md">Bantuan</span>
         </a>
@@ -254,9 +254,9 @@
                     </div>
                 </div>
 
-                <button class="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:opacity-90 transition-opacity">
-                    Lihat Detail
-                </button>
+                <a href="{{ route('kartu') }}" class="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:opacity-90 transition-opacity text-center">
+                    Kartu Tanda Pemilik
+                </a>
             </div>
 
             <!-- Quick Actions -->
@@ -269,13 +269,13 @@
                     </a>
                     <a href="{{ route('kendaraan') }}" class="flex-1 min-w-[160px] flex flex-col items-center gap-2 bg-surface border border-outline-variant rounded-xl p-5 hover:bg-surface-container transition-colors shadow-sm">
                         <span class="material-symbols-outlined text-primary text-3xl">directions_car</span>
-                        <span class="font-semibold text-sm text-on-background">Daftar Mobil</span>
+                        <span class="font-semibold text-sm text-on-background">Daftar Kendaraan</span>
                     </a>
                     <a href="{{ route('invite') }}" class="flex-1 min-w-[160px] flex flex-col items-center gap-2 bg-surface border border-outline-variant rounded-xl p-5 hover:bg-surface-container transition-colors shadow-sm">
                         <span class="material-symbols-outlined text-primary text-3xl">person_add</span>
                         <span class="font-semibold text-sm text-on-background">Undang Tamu</span>
                     </a>
-                    <a href="#" class="flex-1 min-w-[160px] flex flex-col items-center gap-2 bg-surface border border-outline-variant rounded-xl p-5 hover:bg-surface-container transition-colors shadow-sm">
+                    <a href="{{ route('list') }}" class="flex-1 min-w-[160px] flex flex-col items-center gap-2 bg-surface border border-outline-variant rounded-xl p-5 hover:bg-surface-container transition-colors shadow-sm">
                         <span class="material-symbols-outlined text-primary text-3xl">visibility</span>
                         <span class="font-semibold text-sm text-on-background">List Tamu</span>
                     </a>

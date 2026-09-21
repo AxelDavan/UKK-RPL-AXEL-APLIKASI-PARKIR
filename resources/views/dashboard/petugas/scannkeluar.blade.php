@@ -8,7 +8,6 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- HTML5 QR Code Scanner Library -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
@@ -122,7 +121,6 @@
     ::-webkit-scrollbar {
       display: none;
     }
-    /* Fitting video stream ke dalam container CCTV */
     #reader-viewfinder video {
       object-fit: cover !important;
       width: 100% !important;
@@ -342,6 +340,15 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
+        <!-- BANTUAN -->
+        <a class="flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary transition-colors" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-lg text-label-lg">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
+
         <!-- LOGOUT -->
         <form
             method="POST"
@@ -372,40 +379,12 @@
     </div>
 
 </nav>
-<!-- MAIN WRAPPER -->
+
 <div class="pl-72 flex flex-col min-h-screen">
-<!-- TOP HEADER & STATUS BAR -->
-<header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-<div class="h-16 w-full px-8 flex items-center justify-between">
-<!-- Breadcrumb / Section Context -->
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-primary text-[22px]">shield</span>
-<div class="flex items-center gap-1.5 text-on-surface-variant text-xs">
-<span>Terminal Gerbang</span>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="text-on-surface font-semibold">Sistem Pos Terpadu</span>
-</div>
-</div>
-<!-- Top Right Indicators & Profile -->
-<div class="flex items-center gap-6">
-<div class="flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container/60 text-on-secondary-container text-[11px] font-medium">
-<span class="material-symbols-outlined text-[16px]">schedule</span>
-<span>Senin, 24 Okt 2024 • 14:32 WIB</span>
-</div>
-<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#16a34a]/10 text-[#16a34a] text-[11px] font-semibold">
-<span class="w-2 h-2 rounded-full bg-[#16a34a]"></span>
-<span>Sistem Aktif</span>
-</div>
-<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm cursor-pointer">
-<span class="material-symbols-outlined text-[18px]">person</span>
-</div>
-</div>
-</div>
-</header>
-<!-- MAIN CONTENT AREA -->
+
+
 <main class="w-full pt-20 flex-1 bg-background px-8 pb-10">
 <div class="flex flex-col w-full gap-6">
-<!-- PAGE TITLE & DESCRIPTION -->
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-1">
 <div class="flex flex-col gap-1">
 <div class="flex items-center gap-1.5 text-on-surface-variant text-[11px] uppercase tracking-wider font-medium">
@@ -418,7 +397,6 @@
               Pindai kode QR undangan tamu di gerbang keluar untuk menyelesaikan sesi kunjungan dan membuka palang otomatis.
             </p>
 </div>
-<!-- Gate Sensor Readiness Indicator -->
 <div class="flex items-center gap-2 self-start md:self-auto">
 <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-high text-on-surface border border-outline-variant/20">
 <span class="material-symbols-outlined text-[18px] text-error">sensor_door</span>
@@ -426,26 +404,20 @@
 </div>
 </div>
 </div>
-<!-- TWO COLUMN GRID: SCANNER (LEFT) & VERIFICATION CARD (RIGHT) -->
+
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-<!-- LEFT COLUMN: SCANNER VIEWFINDER & GATE STATUS -->
 <div class="lg:col-span-5 flex flex-col gap-6">
-<!-- QR SCANNER CAMERA VIEWFINDER -->
 <div class="relative bg-surface-container-lowest rounded-2xl shadow-sm p-6 overflow-hidden flex flex-col gap-4 border border-outline-variant/30">
-<!-- Camera Stream Header -->
 <div class="flex items-center justify-between z-10">
 <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#191b23]/80 backdrop-blur-md text-surface">
 <span class="w-2 h-2 rounded-full bg-error animate-ping"></span>
 </div>
 </div>
-<!-- Optical Scanner Frame & QR Canvas -->
 <div class="relative w-full aspect-[4/3] rounded-xl bg-[#0b101b] overflow-hidden flex items-center justify-center shadow-inner group">
 
-<!-- ELEMENT KAMERA LIVE WEBCAM (DISISIPKAN TANPA MERUSAK OVERLAY DESIGN) -->
 <div id="reader-viewfinder" class="absolute inset-0 w-full h-full opacity-60 z-0"></div>
 
 <div class="absolute inset-0 bg-[#070b14]/40 flex items-center justify-center pointer-events-none z-10">
-<!-- Subtle Camera Gridlines -->
 <div class="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/10 pointer-events-none"></div>
 <svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
 <defs>
@@ -455,22 +427,18 @@
 </defs>
 <rect fill="url(#tech-grid)" height="100%" width="100%"></rect>
 </svg>
-<!-- Status Banner Inside Camera -->
 <div class="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#191b23]/90 backdrop-blur-md text-surface">
 <span class="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
 <span class="text-[11px] text-surface font-semibold">Kamera Pemindai QR Keluar Siap</span>
 </div>
-<!-- Focus Brackets -->
 <div class="relative w-56 h-56 flex items-center justify-center">
 <div class="absolute -top-2 -left-2 w-7 h-7 border-t-2 border-l-2 border-primary"></div>
 <div class="absolute -top-2 -right-2 w-7 h-7 border-t-2 border-r-2 border-primary"></div>
 <div class="absolute -bottom-2 -left-2 w-7 h-7 border-b-2 border-l-2 border-primary"></div>
 <div class="absolute -bottom-2 -right-2 w-7 h-7 border-b-2 border-r-2 border-primary"></div>
 
-<!-- Red Laser Scanning Line Animation -->
 <div class="absolute left-1 right-1 h-0.5 bg-rose-500 shadow-[0_0_12px_#ba1a1a] animate-bounce"></div>
 </div>
-<!-- Optical Bottom State -->
 <div class="absolute bottom-3 inset-x-3 flex items-center justify-between px-4 py-1.5 rounded-lg bg-[#191b23]/90 backdrop-blur-md text-surface z-10">
 <div class="flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[18px] text-[#16a34a]">check_circle</span>
@@ -483,7 +451,6 @@
 </div>
 </div>
 </div>
-<!-- MANUAL TICKET CODE BUTTON & GATE BARRIER STATUS -->
 <div class="flex items-center justify-between pt-1">
 <button class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors cursor-pointer" onclick="openManualTicketModal()" type="button">
 <span class="material-symbols-outlined text-[18px] text-primary">keyboard</span>
@@ -494,7 +461,6 @@
 </div>
 </div>
 </div>
-<!-- GATE BARRIER STATUS CARD -->
 <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-2 border border-outline-variant/30">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
@@ -515,7 +481,6 @@
                 Palang barrier Gate 02 akan terbuka secara otomatis segera setelah verifikasi dan tombol konfirmasi diaktifkan.
               </p>
 </div>
-<!-- VEHICLE LICENSE PLATE CONFIRMATION INPUT -->
 <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-6 flex flex-col gap-4 border border-outline-variant/30">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
@@ -539,11 +504,8 @@
 </div>
 </div>
 </div>
-<!-- RIGHT COLUMN: CHECK-OUT VERIFICATION SUMMARY -->
 <div class="lg:col-span-7 flex flex-col gap-6">
-<!-- TICKET & HOST VERIFICATION CARD -->
 <div class="bg-surface-container-lowest rounded-2xl shadow-sm p-8 flex flex-col gap-6 border border-outline-variant/30">
-<!-- Header Info & Ticket Code Reference -->
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 bg-surface-container-low p-4 rounded-xl">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
@@ -560,7 +522,6 @@
 </div>
 </div>
 
-<!-- Grid Verification Summary -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <div class="p-4 rounded-xl bg-surface-container-low flex flex-col gap-1 border border-outline-variant/20">
         <span class="text-[11px] font-medium text-on-surface-variant uppercase tracking-wider">Tuan Rumah / Pengundang</span>
@@ -572,7 +533,6 @@
         <span class="text-base font-semibold text-on-surface" id="out-rentang-waktu">-</span>
     </div>
 
-    <!-- Durasi & Hitungan Tarif Parkir -->
     <div class="p-5 rounded-xl bg-surface-container flex flex-col gap-3 sm:col-span-2 border border-outline-variant/30">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
             <div class="flex flex-col gap-1">
@@ -587,21 +547,17 @@
         </div>
     </div>
 </div>
-<!-- SOP SECURITY REMINDER -->
 <div class="flex items-start gap-3 p-4 rounded-xl bg-surface-container-low text-on-surface-variant border border-outline-variant/20">
 <span class="material-symbols-outlined text-secondary text-[20px] shrink-0 mt-0.5">verified_user</span>
 <p class="text-xs leading-relaxed">
 <strong class="text-on-surface font-semibold">Prosedur Keamanan (SOP):</strong> Pastikan fisik kendaraan, nomor plat, dan pengemudi sesuai dengan foto saat kedatangan sebelum membuka palang pintu keluar secara manual ataupun konfirmasi sistem.
                 </p>
 </div>
-<!-- ACTION BUTTONS: CONFIRM EXIT & CANCEL/RESCAN -->
 <div class="flex flex-col sm:flex-row items-center gap-4 pt-1">
-<!-- Red Confirmation Button -->
 <button class="w-full sm:flex-1 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer" id="btnConfirmExit" onclick="handleConfirmExit()" type="button">
 <span class="material-symbols-outlined text-[24px]">door_open</span>
 <span class="text-base font-semibold tracking-wide">Konfirmasi Kendaraan Keluar</span>
 </button>
-<!-- Rescan / Reset Button -->
 <button class="w-full sm:w-auto px-6 py-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-center gap-2 cursor-pointer font-semibold text-sm" onclick="handleResetScan()" type="button">
 <span class="material-symbols-outlined text-[20px]">refresh</span>
 <span>Batal / Scan Ulang</span>
@@ -612,7 +568,7 @@
 </div>
 </div>
 </main>
-<!-- FOOTER STATUS BAR -->
+
 <footer class="w-full bg-surface-container-lowest shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-4 border-t border-outline-variant/20">
 <div class="w-full px-8 flex items-center justify-between text-xs text-on-surface-variant">
 <span>© 2024 Safe Park Pos Jaga. Apartemen Terpadu.</span>
@@ -623,7 +579,7 @@
 </div>
 </footer>
 </div>
-<!-- INTERACTIVE TOAST NOTIFICATION -->
+
 <div class="fixed top-20 right-8 z-50 transform translate-y-[-200%] opacity-0 transition-all duration-300 pointer-events-none" id="gateAlert">
 <div class="bg-rose-600 text-white px-6 py-3.5 rounded-xl shadow-2xl flex items-center gap-3">
 <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -635,13 +591,10 @@
 </div>
 </div>
 </div>
-<!-- MODAL: MANUAL TICKET CODE ENTRY -->
+
 <div aria-labelledby="modalTicketTitle" aria-modal="true" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-all duration-300" id="manualTicketModal" role="dialog">
-<!-- Backdrop Overlay -->
 <div class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeManualTicketModal()"></div>
-<!-- Modal Dialog Window -->
 <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/40 overflow-hidden flex flex-col z-10 transform scale-95 transition-all duration-300" id="manualTicketModalBox">
-<!-- Modal Header -->
 <div class="flex items-center justify-between px-6 py-4 bg-surface-container-low border-b border-outline-variant/30">
 <div class="flex items-center gap-3">
 <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -656,16 +609,13 @@
 <span class="material-symbols-outlined text-[20px]">close</span>
 </button>
 </div>
-<!-- Modal Body Form -->
 <div class="p-6 flex flex-col gap-4">
-<!-- Explanatory Note -->
 <div class="flex items-start gap-3 p-3.5 rounded-xl bg-secondary-container/30 border border-secondary-container text-on-secondary-container">
 <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">info</span>
 <p class="text-xs leading-relaxed">
             Gunakan opsi ini jika barcode/QR tamu tidak dapat dipindai oleh kamera pemindai atau pengunjung hanya membawa struk/nomor referensi.
           </p>
 </div>
-<!-- Field: Kode Tiket / Ref -->
 <div class="flex flex-col gap-1.5">
 <label class="text-xs text-on-surface font-semibold flex items-center justify-between" for="inputModalTicketCode">
 <span>Nomor Kode Tiket / Ref <span class="text-error">*</span></span>
@@ -676,7 +626,6 @@
 <input autocomplete="off" class="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-on-surface font-mono font-bold text-base tracking-wider uppercase placeholder:text-outline/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" id="inputModalTicketCode" placeholder="INV-2026-9815" type="text" value=""/>
 </div>
 </div>
-<!-- Field: Plat Nomor Kendaraan -->
 <div class="flex flex-col gap-1.5">
 <label class="text-xs text-on-surface font-semibold flex items-center justify-between" for="inputModalPlate">
 <span>Plat Nomor Kendaraan</span>
@@ -688,7 +637,6 @@
 </div>
 </div>
 </div>
-<!-- Modal Footer -->
 <div class="flex items-center justify-end gap-3 px-6 py-4 bg-surface-container-low border-t border-outline-variant/30">
 <button class="px-4 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface text-xs font-semibold transition-colors" onclick="closeManualTicketModal()" type="button">
           Batal
@@ -701,12 +649,12 @@
 </div>
 </div>
 
-<!-- JAVASCRIPT HANDLERS SINKRONISASI REAL-TIME -->
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
+
 <script>
     let lastScannedCodeOut = "";
     let isProcessingOut = false;
 
-    // 1. Fungsi AJAX kirim scan QR Keluar ke Laravel Backend
     function processScanKeluar(kode) {
       if (!kode) return;
       if (isProcessingOut) return;
@@ -725,19 +673,15 @@
           if(data.success) {
               lastScannedCodeOut = kode;
 
-              // A. Update Teks Ref Kode
               const refEl = document.getElementById('out-ref');
               if(refEl) refEl.innerText = "#" + data.data.kode_unik;
 
-              // B. Update Pengundang & Nama Tamu
               const pengundangEl = document.getElementById('out-pengundang');
               if(pengundangEl) pengundangEl.innerText = data.data.nama_tamu + " (Tamu " + data.data.pengundang + ")";
 
-              // C. Update Rentang Waktu
               const rentangEl = document.getElementById('out-rentang-waktu');
               if(rentangEl) rentangEl.innerText = data.data.waktu_masuk_keluar;
 
-              // D. Update Durasi Jam & Tarif
               const durasiEl = document.getElementById('out-durasi');
               if(durasiEl) durasiEl.innerText = data.data.durasi_text;
 
@@ -747,7 +691,6 @@
               const totalHargaEl = document.getElementById('out-total-harga');
               if(totalHargaEl) totalHargaEl.innerText = data.data.total_harga;
 
-              // E. Update Plat Kendaraan Input
               const inputPlat = document.getElementById('inputPlatKendaraan');
               if(inputPlat) inputPlat.value = data.data.nomor_plat;
 
@@ -770,7 +713,6 @@
       });
     }
 
-    // Modal Manual Controls
     function openManualTicketModal() {
       const modal = document.getElementById('manualTicketModal');
       const modalBox = document.getElementById('manualTicketModalBox');
@@ -826,7 +768,6 @@
       }
     });
 
-    // Action Tombol Konfirmasi Keluar
     function handleConfirmExit() {
       if (!lastScannedCodeOut) {
           alert('Silakan scan QR Pass Tamu keluar terlebih dahulu!');
@@ -861,7 +802,6 @@
       }, 2500);
     }
 
-    // Reset State
     function handleResetScan() {
       lastScannedCodeOut = "";
       isProcessingOut = false;
@@ -896,7 +836,6 @@
       btn.classList.remove('opacity-75');
     }
 
-    // Inisialisasi Stream Kamera HTML5 QR
     let html5QrCodeOut = new Html5Qrcode("reader-viewfinder");
     html5QrCodeOut.start(
         { facingMode: "environment" }, 
@@ -906,6 +845,45 @@
         }
     ).catch(err => {
         console.warn("Kamera keluar tidak aktif:", err);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const bantuanBadge = document.getElementById('bantuanBadge');
+        const notifSound = document.getElementById('notifSound');
+        let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+        async function checkNewMessages() {
+          try {
+            const response = await fetch("{{ route('admin.bantuan.users') }}");
+            if (!response.ok) return;
+
+            const users = await response.json();
+
+            if (users.length > 0) {
+              let latestChatId = 0;
+              users.forEach(u => {
+                if (u.last_chat_id > latestChatId) {
+                  latestChatId = u.last_chat_id;
+                }
+              });
+
+              if (latestChatId > lastChatId) {
+                if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+                if (notifSound) {
+                  notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+                }
+
+                lastChatId = latestChatId;
+                localStorage.setItem('last_seen_chat_id', lastChatId);
+              }
+            }
+          } catch (err) {
+            console.error("Gagal mengecek notifikasi pesan:", err);
+          }
+        }
+
+        setInterval(checkNewMessages, 3000);
     });
   </script>
 </body></html>

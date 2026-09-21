@@ -125,7 +125,7 @@
     <!-- MENU UTAMA -->
     <div class="flex-1 flex flex-col gap-1">
 
-        <!-- DASHBOARD - AKTIF -->
+        <!-- DASHBOARD -->
         <a
             href="{{ route('dashboard') }}"
             class="flex items-center gap-4
@@ -265,7 +265,6 @@
             </span>
         </a>
 
-
         <!-- PARKIR -->
         <a
             href="{{ route('parkir') }}"
@@ -311,6 +310,14 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
+        <!-- BANTUAN -->
+        <a class="flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary transition-colors" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-lg text-label-lg">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
 
         <!-- LOGOUT -->
         <form
@@ -345,24 +352,6 @@
 
 <!-- MAIN CONTENT WRAPPER -->
 <div class="pl-72 flex flex-col min-h-screen">
-    <header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-xs">
-        <div class="h-16 w-full px-xl flex items-center justify-between">
-            <div class="flex items-center gap-md">
-                <span class="material-symbols-outlined text-primary text-[22px]">shield</span>
-                <div class="flex items-center gap-xs text-on-surface-variant text-xs">
-                    <span>Terminal Gerbang</span>
-                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                    <span class="text-on-surface font-semibold">Sistem Pos Terpadu</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-lg">
-                <div class="flex items-center gap-sm px-md py-xs rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold">
-                    <span class="material-symbols-outlined text-[16px]">schedule</span>
-                    <span id="header-clock">Loading waktu...</span>
-                </div>
-            </div>
-        </div>
-    </header>
 
     <main class="w-full pt-20 flex-1 bg-background p-xl">
         <div class="flex flex-col w-full gap-lg">
@@ -508,6 +497,8 @@
     </main>
 </div>
 
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
+
 <!-- JAVASCRIPT CARI DATA & PROSES KELUAR -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -648,6 +639,44 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.innerHTML = '<span class="material-symbols-outlined text-[22px]">lock_open</span><span>Proses Kendaraan Keluar & Buka Palang</span>';
         }
     });
+
+    // 6. NOTIFIKASI BANTUAN REAL-TIME
+    const bantuanBadge = document.getElementById('bantuanBadge');
+    const notifSound = document.getElementById('notifSound');
+    let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+    async function checkNewMessages() {
+      try {
+        const response = await fetch("{{ route('admin.bantuan.users') }}");
+        if (!response.ok) return;
+
+        const users = await response.json();
+
+        if (users.length > 0) {
+          let latestChatId = 0;
+          users.forEach(u => {
+            if (u.last_chat_id > latestChatId) {
+              latestChatId = u.last_chat_id;
+            }
+          });
+
+          if (latestChatId > lastChatId) {
+            if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+            if (notifSound) {
+              notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            lastChatId = latestChatId;
+            localStorage.setItem('last_seen_chat_id', lastChatId);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengecek notifikasi pesan:", err);
+      }
+    }
+
+    setInterval(checkNewMessages, 3000);
 });
 </script>
 

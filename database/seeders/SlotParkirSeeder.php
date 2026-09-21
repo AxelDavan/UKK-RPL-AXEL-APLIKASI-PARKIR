@@ -15,7 +15,7 @@ class SlotParkirSeeder extends Seeder
     {
         for($i = 1; $i <= 50; $i++) {
             SlotParkir::create([
-            'area_parkir_id' => 1,
+            'area_parkir_id' => 14,
             'kode_slot' => 'A-' . str_pad($i, 2, '0', STR_PAD_LEFT),
             'status' => 'tersedia',
             ]);
@@ -23,7 +23,7 @@ class SlotParkirSeeder extends Seeder
         
         for($i = 1; $i <= 50; $i++) {
             SlotParkir::create([
-            'area_parkir_id' => 3,
+            'area_parkir_id' => 15,
             'kode_slot' => 'B-' . str_pad($i, 2, '0', STR_PAD_LEFT),
             'status' => 'tersedia',
             ]);
@@ -31,7 +31,7 @@ class SlotParkirSeeder extends Seeder
 
         for($i = 1; $i <= 50; $i++) {
             SlotParkir::create([
-            'area_parkir_id' => 4,
+            'area_parkir_id' => 16,
             'kode_slot' => 'VIP-' . str_pad($i, 2, '0', STR_PAD_LEFT),
             'status' => 'tersedia',
             ]);

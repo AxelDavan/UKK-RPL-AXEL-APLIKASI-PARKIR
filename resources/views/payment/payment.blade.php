@@ -292,7 +292,7 @@
       <!-- Tombol Simulasi Pembayaran untuk Asesor UKK -->
       <div class="mt-6 text-center">
           <a href="{{ route('simulasi.sukses', $payment->id) }}" 
-             class="w-full inline-flex justify-center items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all active:scale-95">
+             class="w-full inline-flex justify-center items-center gap-2 bg-white hover:bg-white text-black font-bold py-3 px-6 rounded-xl shadow-lg transition-all active:scale-95">
               <span class="ph-bold ph-check-circle text-2xl"></span>
               Bayar Sekarang / Simulasi Berhasil
           </a>
@@ -301,7 +301,7 @@
 
       <!-- <a href="{{ route('simulasi.gagal', $payment->id) }}" 
        onclick="return confirm('Yakin ingin membatalkan pembayaran ini?')"
-       class="w-full inline-flex justify-center items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all active:scale-95 text-sm">
+       class="w-full inline-flex justify-center items-center gap-2 bg-white hover:bg-white text-black font-bold py-3 px-4 rounded-xl shadow-md transition-all active:scale-95 text-sm">
         <span class="material-symbols-outlined text-base"></span>
         Batalkan / Simulasi Gagal
       </a> -->

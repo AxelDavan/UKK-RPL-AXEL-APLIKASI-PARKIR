@@ -4,12 +4,10 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Safe Park - Scan QR Masuk</title>
-<!-- Google Fonts & Material Symbols -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<!-- HTML5 QR Code Scanner Library -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
     @layer base {
@@ -30,7 +28,6 @@
     ::-webkit-scrollbar {
       display: none;
     }
-    /* Styling khusus agar video webcam html5-qrcode pas di frame CCTV tanpa merusak UI */
     #reader-viewfinder video {
       object-fit: cover !important;
       width: 100% !important;
@@ -43,7 +40,6 @@
       background: transparent !important;
     }
   </style>
-<!-- Tailwind CSS Configuration -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script id="tailwind-config">
     tailwind.config = {
@@ -144,9 +140,8 @@
   </script>
 </head>
 <body class="bg-background font-body-md text-on-surface antialiased min-h-screen">
-<!-- ========================================== -->
-<!-- SIDEBAR NAVIGATION                        -->
-<!-- ========================================== -->
+
+<!-- SIDEBAR NAVIGATION -->
 <nav class="hidden md:flex flex-col h-full py-6 w-64 fixed left-0 top-0
             bg-surface-container-low
             border-r border-outline-variant
@@ -351,6 +346,15 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
+        <!-- BANTUAN -->
+        <a class="flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary transition-colors" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-lg text-label-lg">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
+
         <!-- LOGOUT -->
         <form
             method="POST"
@@ -381,46 +385,11 @@
     </div>
 
 </nav>
-<!-- ========================================== -->
-<!-- MAIN LAYOUT WRAPPER                        -->
-<!-- ========================================== -->
+
 <div class="pl-72 flex flex-col min-h-screen">
-<!-- ========================================== -->
-<!-- TOP HEADER BAR                             -->
-<!-- ========================================== -->
-<header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-40 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-<div class="h-16 w-full px-xl flex items-center justify-between">
-<!-- Breadcrumb & Gate System Title -->
-<div class="flex items-center gap-md">
-<span class="material-symbols-outlined text-primary text-[22px]">shield</span>
-<div class="flex items-center gap-xs text-on-surface-variant font-label-lg text-label-lg">
-<span>Terminal Gerbang</span>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="text-on-surface font-semibold">Sistem Pos Terpadu</span>
-</div>
-</div>
-<!-- Header Status & Profile Actions -->
-<div class="flex items-center gap-lg">
-<div class="flex items-center gap-sm px-md py-xs rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md">
-<span class="material-symbols-outlined text-[16px]">schedule</span>
-<span>Senin, 24 Okt 2024 • 14:32 WIB</span>
-</div>
-<div class="flex items-center gap-xs px-md py-xs rounded-full bg-[#16a34a]/10 text-[#16a34a] font-label-md text-label-md font-semibold">
-<span class="w-2 h-2 rounded-full bg-[#16a34a]"></span>
-<span>Sistem Aktif</span>
-</div>
-<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
-</div>
-</div>
-</div>
-</header>
-<!-- ========================================== -->
-<!-- MAIN CONTENT AREA                          -->
-<!-- ========================================== -->
+
 <main class="w-full pt-16 flex-1 bg-background p-xl">
 <div class="flex flex-col w-full">
-<!-- Page Header & Overview -->
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
 <div class="flex flex-col gap-xs">
 <div class="flex items-center gap-sm">
@@ -437,13 +406,9 @@
 </div>
 <div class="flex items-center gap-md"></div>
 </div>
-<!-- 2-Column Responsive Grid -->
+
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-xl items-start">
-<!-- ========================================== -->
-<!-- LEFT COLUMN: SCANNER VIEWFINDER & CAPACITY -->
-<!-- ========================================== -->
 <div class="xl:col-span-7 flex flex-col gap-lg">
-<!-- Scanner Viewfinder Card -->
 <div class="bg-surface-container-lowest rounded-xl shadow-md p-lg flex flex-col gap-md relative overflow-hidden">
 <div class="flex items-center justify-between pb-xs">
 <div class="flex items-center gap-sm">
@@ -455,14 +420,11 @@
 <span class="font-semibold text-on-surface px-xs py-0.5 rounded bg-surface-container">SCN-IN-GATE01</span>
 </div>
 </div>
-<!-- Live CCTV / Optical Scanner Display -->
-<div class="relative w-full h-[400px] rounded-xl overflow-hidden bg-on-background flex items-center justify-center select-none group">
 
-<!-- ELEMENT KAMERA LIVE WEBCAM (DISISIPKAN TANPA MERUSAK OVERLAY DESIGN) -->
+<div class="relative w-full h-[400px] rounded-xl overflow-hidden bg-on-background flex items-center justify-center select-none group">
 <div id="reader-viewfinder" class="absolute inset-0 w-full h-full opacity-60 z-0"></div>
 
 <div class="absolute inset-0 bg-gradient-to-b from-on-background/70 via-transparent to-on-background/80 pointer-events-none z-10"></div>
-<!-- Overlay Camera Specs -->
 <div class="absolute top-md left-md flex items-center gap-xs px-sm py-xs rounded-full bg-on-background/80 backdrop-blur-md text-surface font-label-md text-label-md z-10">
 <span class="w-2 h-2 rounded-full bg-primary"></span>
 <span>Kamera Scanner Siaga • ISO Auto • HD 1080p</span>
@@ -471,14 +433,13 @@
 <span class="material-symbols-outlined text-[14px] text-inverse-primary">tune</span>
 <span>WDR AKTIF</span>
 </div>
-<!-- QR Target Box & Verified Animation Frame -->
+
 <div class="relative w-64 h-64 flex items-center justify-center z-10">
-<!-- Corner Guides -->
 <div class="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-inverse-primary"></div>
 <div class="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-inverse-primary"></div>
 <div class="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-inverse-primary"></div>
 <div class="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-inverse-primary"></div>
-<!-- Verified Card Notification (Dinamis Muncul/Sembunyi) -->
+
 <div id="verified-overlay" class="hidden absolute inset-0 bg-primary/10 rounded-lg flex flex-col items-center justify-center p-md backdrop-blur-[2px] shadow-[inset_0_0_24px_rgba(0,83,219,0.3)] transition-all">
 <div class="w-16 h-16 rounded-full bg-surface-container-lowest/90 flex items-center justify-center shadow-lg mb-sm">
 <span class="material-symbols-outlined text-primary text-[36px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
@@ -486,10 +447,10 @@
 <span class="font-title-md text-title-md text-surface text-center font-bold tracking-tight">Kode QR Terverifikasi</span>
 <span class="font-label-md text-label-md text-inverse-primary mt-xs font-mono" id="overlay-qr-code">TKN-RES-2024-9982B</span>
 </div>
-<!-- Optical Laser Guide Line -->
+
 <div class="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-inverse-primary to-transparent shadow-[0_0_12px_#b4c5ff] animate-pulse top-1/2"></div>
 </div>
-<!-- Scanner Diagnostics Overlay -->
+
 <div class="absolute bottom-md left-md right-md flex items-center justify-between pointer-events-none z-10">
 <div class="flex items-center gap-xs text-surface/80 font-label-md text-label-md font-mono bg-on-background/70 px-sm py-xs rounded">
 <span>LATENSI: 18ms</span>
@@ -502,7 +463,7 @@
 </div>
 </div>
 </div>
-<!-- Gate Status & Manual Key-In Action -->
+
 <div class="flex flex-col sm:flex-row items-center justify-between gap-md pt-xs">
 <div class="flex items-center gap-sm">
 <div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant">
@@ -520,7 +481,6 @@
 </div>
 </div>
 
-<!-- Parking Lot Realtime Capacity Badge -->
 <div class="bg-surface-container-lowest rounded-xl shadow-sm p-lg flex items-center justify-between gap-md">
     <div class="flex items-center gap-md">
         <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary">
@@ -536,13 +496,8 @@
 </div>
 </div>
 
-<!-- ========================================== -->
-<!-- RIGHT COLUMN: GUEST VERIFICATION DETAILS   -->
-<!-- ========================================== -->
 <div class="xl:col-span-5 flex flex-col gap-lg">
-<!-- Scanned Ticket Info & Actions Card -->
 <div class="bg-surface-container-lowest rounded-xl shadow-md p-lg flex flex-col gap-lg relative">
-<!-- Access Authorization Header -->
 <div class="flex items-center justify-between pb-xs">
 <div class="flex items-center gap-xs px-md py-xs rounded-full bg-primary/10 text-primary font-label-md text-label-md font-bold">
 <span class="material-symbols-outlined text-[16px]">verified_user</span>
@@ -550,7 +505,7 @@
 </div>
 <span class="font-label-md text-label-md text-secondary font-mono" id="display-ref-id">ID: #INV-XXXX</span>
 </div>
-<!-- Host / Resident Unit Details -->
+
 <div class="p-md rounded-xl bg-surface-container flex flex-col gap-xs">
     <div class="flex items-center gap-xs text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
         <span class="material-symbols-outlined text-[16px]">home_pin</span>
@@ -566,7 +521,7 @@
     <label class="font-label-lg text-label-lg text-on-surface font-semibold">Nomor Plat Terdaftar</label>
     <input class="w-full px-md py-md rounded-xl bg-surface-container-low text-on-surface font-title-lg text-title-lg font-bold tracking-widest uppercase outline-none" id="res-plat" type="text" value="-" readonly/>
 </div>
-<!-- Access Category & Validity Grid -->
+
 <div class="grid grid-cols-2 gap-md">
 <div class="p-md rounded-xl bg-surface-container-low flex flex-col gap-xs">
 <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Kategori Akses</span>
@@ -579,7 +534,7 @@
 <span class="font-label-md text-label-md text-secondary">Hingga Besok 14:00</span>
 </div>
 </div>
-<!-- Primary Action Buttons -->
+
 <div class="flex flex-col gap-sm pt-xs">
 <button class="w-full bg-primary hover:bg-primary-container text-on-primary font-title-md text-title-md font-bold py-md px-lg rounded-xl shadow-md transition-all flex items-center justify-center gap-sm group" type="button" onclick="confirmEntry()">
 <span class="material-symbols-outlined text-[22px] group-hover:translate-x-0.5 transition-transform">garage</span>
@@ -591,7 +546,7 @@
 </button>
 </div>
 </div>
-<!-- Standard Operating Procedures (SOP) Box -->
+
 <div class="bg-surface-container-low rounded-xl p-lg flex flex-col gap-sm">
 <div class="flex items-center gap-sm text-on-surface">
 <span class="material-symbols-outlined text-primary text-[20px]">info</span>
@@ -619,7 +574,6 @@
 </footer>
 </div>
 
-<!-- MODAL MANUAL TICKET -->
 <div class="fixed inset-0 z-50 flex items-center justify-center p-md bg-on-background/70 backdrop-blur-md transition-all duration-200" id="manual-ticket-modal" style="display: none;">
 <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-2xl overflow-hidden flex flex-col border border-outline-variant/30">
 <div class="p-lg border-b border-surface-container flex items-start justify-between bg-surface-container-low">
@@ -664,15 +618,15 @@
 </div>
 </div>
 
-<!-- SCRIPT HANDLER DINAMIS REAL-TIME -->
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
+
 <script>
 let lastScannedCode = "";
 let isProcessing = false;
 
-// 1. Fungsi AJAX kirim kode ke Laravel
 function processScanMasuk(kode) {
     if (!kode) return;
-    if (isProcessing) return; // Mencegah spam request berulang
+    if (isProcessing) return;
     isProcessing = true;
 
     fetch("{{ route('scan.masuk.process') }}", {
@@ -688,27 +642,21 @@ function processScanMasuk(kode) {
         if(data.success) {
             lastScannedCode = kode;
             
-            // A. Update Teks ID / Ref
             const elRef = document.getElementById('display-ref-id') || document.querySelector('.font-mono.text-secondary');
             if(elRef) elRef.innerText = "ID: #" + data.data.kode_unik;
 
-            // B. Update Nama Pengundang
             const elPengundang = document.getElementById('res-pengundang');
             if(elPengundang) elPengundang.innerText = data.data.nama_tamu + " (Tamu " + data.data.pengundang + ")";
 
-            // C. Update Unit
             const elUnit = document.getElementById('res-unit');
             if(elUnit) elUnit.innerText = data.data.nomor_unit;
 
-            // D. Update Input Plat Nomor
             const elPlat = document.getElementById('res-plat');
             if(elPlat) elPlat.value = data.data.nomor_plat;
 
-            // E. Update Kapasitas Slot Parkir
             const elKapasitas = document.getElementById('text-kapasitas-parkir');
             if(elKapasitas && data.kapasitas) elKapasitas.innerText = data.kapasitas.text;
 
-            // F. Tampilkan Card Verified di Tengah Viewfinder
             const overlayVerified = document.getElementById('verified-overlay');
             if(overlayVerified) {
                 const elQrCode = document.getElementById('overlay-qr-code');
@@ -716,7 +664,6 @@ function processScanMasuk(kode) {
                 overlayVerified.classList.remove('hidden');
             }
 
-            // G. Status Decode
             const elStatusText = document.getElementById('scan-status-text');
             if(elStatusText) elStatusText.innerText = "DECODE: VALID";
 
@@ -730,14 +677,12 @@ function processScanMasuk(kode) {
         alert("Gagal terhubung ke server.");
     })
     .finally(() => {
-        // Debounce 3 detik sebelum bisa scan QR selanjutnya
         setTimeout(() => {
             isProcessing = false;
         }, 3000);
     });
 }
 
-// 2. Fungsi Tombol Konfirmasi Masuk
 function confirmEntry() {
     if (!lastScannedCode) {
         alert('Silakan pindaikan QR Pass Tamu terlebih dahulu!');
@@ -760,7 +705,6 @@ function confirmEntry() {
     }, 2500);
 }
 
-// 3. Reset Tampilan
 function resetScanView() {
     lastScannedCode = "";
     isProcessing = false;
@@ -786,7 +730,6 @@ function resetScanView() {
     if(iconBarrier) iconBarrier.innerText = "lock";
 }
 
-// 4. Verifikasi Manual
 function processManualInput() {
     const inputEl = document.getElementById('input-manual-code');
     if(inputEl && inputEl.value.trim()) {
@@ -796,7 +739,6 @@ function processManualInput() {
     }
 }
 
-// 5. Inisialisasi Kamera Pemindai pada Frame CCTV
 let html5QrCode = new Html5Qrcode("reader-viewfinder");
 html5QrCode.start(
     { facingMode: "environment" }, 
@@ -806,6 +748,45 @@ html5QrCode.start(
     }
 ).catch(err => {
     console.warn("Kamera tidak aktif:", err);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const bantuanBadge = document.getElementById('bantuanBadge');
+    const notifSound = document.getElementById('notifSound');
+    let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+    async function checkNewMessages() {
+      try {
+        const response = await fetch("{{ route('admin.bantuan.users') }}");
+        if (!response.ok) return;
+
+        const users = await response.json();
+
+        if (users.length > 0) {
+          let latestChatId = 0;
+          users.forEach(u => {
+            if (u.last_chat_id > latestChatId) {
+              latestChatId = u.last_chat_id;
+            }
+          });
+
+          if (latestChatId > lastChatId) {
+            if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+            if (notifSound) {
+              notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            lastChatId = latestChatId;
+            localStorage.setItem('last_seen_chat_id', lastChatId);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengecek notifikasi pesan:", err);
+      }
+    }
+
+    setInterval(checkNewMessages, 3000);
 });
 </script>
 </body>

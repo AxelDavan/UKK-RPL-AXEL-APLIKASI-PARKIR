@@ -138,7 +138,7 @@
             <span class="material-symbols-outlined">person</span>
             <span class="font-title-md text-title-md">Profile</span>
         </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="#">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
             <span class="material-symbols-outlined">help</span>
             <span class="font-title-md text-title-md">Bantuan</span>
         </a>
@@ -165,10 +165,16 @@
                 <h2 class="font-headline-lg text-headline-lg text-on-background mb-xs">Kendaraan Saya</h2>
                 <p class="font-body-lg text-body-lg text-secondary">Kelola kendaraan yang terdaftar di akun Anda.</p>
             </div>
-            <button class="bg-primary-container text-on-primary font-label-lg text-label-lg px-md py-sm rounded-lg hover:bg-primary transition-colors shadow-sm flex items-center gap-xs" onclick="document.getElementById('registerModal').classList.remove('hidden')">
-                <span class="material-symbols-outlined text-[18px]">add</span>
-                Daftarkan Kendaraan
-            </button>
+           <div class="flex items-center gap-2">
+                <button class="bg-primary text-white font-label-lg text-label-lg px-md py-sm rounded-lg hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-xs" onclick="openRegisterModal()">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                    Daftarkan Kendaraan
+                </button>
+                <button class="bg-secondary-container text-on-secondary-container font-label-lg text-label-lg px-md py-sm rounded-lg hover:opacity-90 transition-colors shadow-sm flex items-center gap-xs" onclick="openAssignModal()">
+                    <span class="material-symbols-outlined text-[18px]">local_parking</span>
+                    Tempatkan ke Slot Parkir
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
@@ -235,7 +241,21 @@
 
                                 <!-- Tombol Hapus Langsung -->
                                 <button type="button" 
-                                        onclick="if(confirm('Yakin ingin menghapus kendaraan <?= e($k->nomor_plat ?? $k->nomor_plat ?? '') ?>?')) { document.getElementById('delete-form-<?= $k->id ?>').submit(); }"
+                                        onclick="if(confirm('Yakin ingin menghapus kendaraan ${plat}?')) { 
+                                            fetch('/kendaraan-owner/' + k.id, {
+                                                method: 'DELETE',
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                    'Accept': 'application/json'
+                                                }
+                                            }).then(res => res.json()).then(data => {
+                                                if(data.success) {
+                                                    // Data akan otomatis diperbarui oleh polling berikutnya
+                                                } else {
+                                                    alert('Gagal menghapus kendaraan.');
+                                                }
+                                            });
+                                        }"
                                         class="flex items-center gap-1 bg-error/10 hover:bg-error text-error hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border border-error/20 shadow-sm active:scale-95">
                                     <span class="material-symbols-outlined text-[16px]">delete</span>
                                     Hapus
@@ -290,12 +310,14 @@
     </div>
 </main>
 
-<!-- Modal Register Real-time -->
+<!-- Modal Dinamis (1 Modal untuk 2 Fungsi) -->
 <div class="fixed inset-0 z-[100] hidden" id="registerModal">
     <div class="absolute inset-0 bg-inverse-surface/40 backdrop-blur-sm" onclick="closeRegisterModal()"></div>
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[calc(100%-32px)] max-w-2xl bg-surface rounded-[16px] shadow-[0_12px_32px_rgba(0,0,0,0.12)] flex flex-col max-h-[90vh]">
+        
+        <!-- Header Modal Dinamis -->
         <div class="flex justify-between items-center p-lg border-b border-outline-variant">
-            <h3 class="font-title-lg text-title-lg text-on-background">Daftarkan Kendaraan Baru</h3>
+            <h3 class="font-title-lg text-title-lg text-on-background" id="modalTitle">Daftarkan Kendaraan Baru</h3>
             <button class="text-secondary hover:text-on-background p-1 rounded-full hover:bg-surface-container" onclick="closeRegisterModal()">
                 <span class="material-symbols-outlined">close</span>
             </button>
@@ -303,60 +325,20 @@
 
         <form id="formDaftarKendaraan" action="{{ route('kendaraan.store.ajax') }}" method="POST" onsubmit="submitKendaraan(event)">
             @csrf
-            <div class="p-lg overflow-y-auto font-body-md text-body-md text-on-background space-y-md">
-                
-                <!-- Pilih Slot Parkir -->
-                <div class="flex flex-col gap-xs">
-                    <label class="font-label-lg text-label-lg text-on-surface font-semibold flex items-center gap-1">
-                        <span class="material-symbols-outlined text-primary text-[18px]">local_parking</span>
-                        Pilih Slot Parkir Anda
-                    </label>
-                    <select id="select_slot" name="pemesanan_id" required class="w-full rounded-lg border-outline-variant focus:border-primary-container focus:ring focus:ring-primary-container/20 bg-surface-container-lowest py-2 px-3">
-                        <option value="">-- Memuat slot parkir Anda... --</option>
-                    </select>
-                    <p class="text-xs text-secondary">*Hanya menampilkan slot parkir yang pernah Anda beli/pesan.</p>
-                </div>
-            
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-                    <div class="flex flex-col gap-xs">
-                        <label class="font-label-lg text-label-lg text-on-surface">Nomor Polisi (Plat)</label>
-                        <!-- Disesuaikan dengan kolom nomor_plat -->
-                        <input name="nomor_plat" required class="w-full rounded-lg border-outline-variant focus:border-primary-container focus:ring focus:ring-primary-container/20 bg-surface-container-lowest py-2 px-3 font-mono uppercase" placeholder="B 1234 CD" type="text"/>
-                    </div>
-                    <div class="flex flex-col gap-xs">
-                        <label class="font-label-lg text-label-lg text-on-surface">Jenis Kendaraan</label>
-                        <!-- Disesuaikan dengan enum ['mobil', 'motor', 'truk'] -->
-                        <select name="jenis_kendaraan" required class="w-full rounded-lg border-outline-variant focus:border-primary-container focus:ring focus:ring-primary-container/20 bg-surface-container-lowest py-2 px-3">
-                            <option value="mobil">Mobil</option>
-                            <option value="motor">Motor</option>
-                            <option value="truk">Truk</option>
-                        </select>
-                    </div>
-                </div>
-            
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
-                    <div class="flex flex-col gap-xs">
-                        <label class="font-label-lg text-label-lg text-on-surface">Merk Kendaraan</label>
-                        <!-- Disesuaikan dengan kolom merk -->
-                        <input name="merk" required class="w-full rounded-lg border-outline-variant focus:border-primary-container focus:ring focus:ring-primary-container/20 bg-surface-container-lowest py-2 px-3" placeholder="Contoh: Honda Vario 150" type="text"/>
-                    </div>
-                    <div class="flex flex-col gap-xs">
-                        <label class="font-label-lg text-label-lg text-on-surface">Warna</label>
-                        <!-- Disesuaikan dengan kolom warna -->
-                        <input name="warna" required class="w-full rounded-lg border-outline-variant focus:border-primary-container focus:ring focus:ring-primary-container/20 bg-surface-container-lowest py-2 px-3" placeholder="Contoh: Hitam" type="text"/>
-                    </div>
-                </div>
+            <div class="p-lg overflow-y-auto font-body-md text-body-md text-on-background space-y-md" id="modalBodyContent">
+                <!-- Konten Form akan disuntikkan via JavaScript -->
             </div>
         
             <div class="p-lg border-t border-outline-variant flex justify-end gap-sm bg-surface-container-lowest rounded-b-[16px]">
                 <button type="button" class="px-md py-sm rounded-lg font-label-lg text-label-lg border border-outline text-secondary hover:bg-surface-container transition-colors" onclick="closeRegisterModal()">Batal</button>
-                <button type="submit" id="btnSubmitModal" class="px-md py-sm rounded-lg font-label-lg text-label-lg bg-primary-container text-on-primary hover:bg-primary transition-colors shadow-sm">Simpan Pendaftaran</button>
+                <button type="submit" id="btnSubmitModal" class="px-md py-sm rounded-lg font-label-lg text-label-lg bg-primary text-white hover:bg-primary/90 transition-colors shadow-sm">Simpan</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Script Polling Realtime JavaScript -->
+<!-- Script Polling Realtime & 2 Fungsi Modal JavaScript -->
 <script>
     setInterval(() => {
         fetch("/api/kendaraan/real-time")
@@ -396,7 +378,17 @@
                                         <p class="font-label-lg text-label-lg text-primary font-mono font-semibold tracking-wider">${plat}</p>
                                     </div>
                                     <button type="button" 
-                                            onclick="if(confirm('Yakin ingin menghapus kendaraan ${plat}?')) { alert('Proses hapus ID: ' + ${k.id}); }"
+                                            onclick="if(confirm('Yakin ingin menghapus kendaraan ${plat}?')) { 
+                                                fetch('/kendaraan-owner/' + ${k.id}, {
+                                                    method: 'DELETE',
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Accept': 'application/json'
+                                                    }
+                                                }).then(res => res.json()).then(d => {
+                                                    if(!d.success) alert('Gagal menghapus kendaraan.');
+                                                });
+                                            }"
                                             class="flex items-center gap-1 bg-error/10 hover:bg-error text-error hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border border-error/20 shadow-sm active:scale-95">
                                         <span class="material-symbols-outlined text-[16px]">delete</span>
                                         Hapus
@@ -421,96 +413,170 @@
             .catch(err => console.error(err));
     }, 3000);
 
-    // Function Buka Modal & Fetch Slot Milik User
+    // ==========================================
+    // FUNGSI 1: Modal Daftarkan Kendaraan Baru
+    // ==========================================
     function openRegisterModal() {
-    document.getElementById('registerModal').classList.remove('hidden');
-    const selectSlot = document.getElementById('select_slot');
-    selectSlot.innerHTML = '<option value="">-- Memuat slot parkir Anda... --</option>';
+        document.getElementById('registerModal').classList.remove('hidden');
+        document.getElementById('modalTitle').innerText = "Daftarkan Kendaraan Baru";
+        
+        const bodyEl = document.getElementById('modalBodyContent');
+        bodyEl.innerHTML = `
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-lg text-label-lg text-on-surface font-semibold">Pilih Slot Parkir (Opsional)</label>
+                <select id="select_slot_reg" name="pemesanan_id" class="w-full rounded-lg border-outline-variant bg-surface-container-lowest py-2 px-3">
+                    <option value="">-- Tanpa Slot / Belum Punya Slot --</option>
+                </select>
+                <span class="text-xs text-secondary">*Boleh dikosongkan jika belum memiliki slot.</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-lg text-label-lg text-on-surface">Nomor Polisi (Plat)</label>
+                    <input name="nomor_plat" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest py-2 px-3 uppercase font-mono" placeholder="B 1234 CD" type="text"/>
+                </div>
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-lg text-label-lg text-on-surface">Jenis Kendaraan</label>
+                    <select name="jenis_kendaraan" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest py-2 px-3">
+                        <option value="mobil">Mobil</option>
+                        <option value="motor">Motor</option>
+                        <option value="truk">Truk</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-lg text-label-lg text-on-surface">Merk Kendaraan</label>
+                    <input name="merk" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest py-2 px-3" placeholder="Contoh: Honda Vario" type="text"/>
+                </div>
+                <div class="flex flex-col gap-xs">
+                    <label class="font-label-lg text-label-lg text-on-surface">Warna</label>
+                    <input name="warna" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest py-2 px-3" placeholder="Contoh: Hitam" type="text"/>
+                </div>
+            </div>
+        `;
+        fetchSlotOptions('select_slot_reg', true);
+    }
 
-    fetch("{{ route('kendaraan.myslot') }}")
-        .then(res => res.json())
+    // ==========================================================
+    // FUNGSI 2: Modal Tempatkan Kendaraan Eksisting ke Slot Baru
+    // ==========================================================
+    function openAssignModal() {
+        document.getElementById('registerModal').classList.remove('hidden');
+        document.getElementById('modalTitle').innerText = "Tempatkan Kendaraan ke Slot Parkir";
+
+        const bodyEl = document.getElementById('modalBodyContent');
+        bodyEl.innerHTML = `
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-lg text-label-lg text-on-surface font-semibold">Pilih Slot Parkir Baru</label>
+                <select id="select_slot_assign" name="pemesanan_id" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest py-2 px-3">
+                    <option value="">-- Memuat slot kosong Anda... --</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-xs">
+                <label class="font-label-lg text-label-lg text-on-surface font-semibold">Pilih Kendaraan Anda</label>
+                <select id="select_kendaraan_assign" name="kendaraan_id" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest py-2 px-3">
+                    <option value="">-- Memuat kendaraan Anda... --</option>
+                </select>
+                <span class="text-xs text-secondary">*Hanya menampilkan kendaraan yang belum memiliki tempat parkir.</span>
+            </div>
+        `;
+        fetchSlotOptions('select_slot_assign', false);
+        fetchUnassignedVehicles('select_kendaraan_assign');
+    }
+
+    function closeRegisterModal() {
+        document.getElementById('registerModal').classList.add('hidden');
+        document.getElementById('formDaftarKendaraan').reset();
+    }
+
+    // Helper fetch slot
+    function fetchSlotOptions(elementId, isOptional) {
+        fetch("{{ route('kendaraan.myslot') }}")
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById(elementId);
+                if(!select) return;
+                
+                if (isOptional) {
+                    select.innerHTML = '<option value="">-- Tanpa Slot / Belum Punya Slot --</option>';
+                } else {
+                    select.innerHTML = '<option value="">-- Pilih Slot Parkir --</option>';
+                }
+
+                if (data.slots && data.slots.length > 0) {
+                    data.slots.forEach(p => {
+                        let namaSlot = p.slot_parkir ? (p.slot_parkir.kode_slot || ('Slot #' + p.slot_parkir.id)) : ('Pemesanan #' + p.id);
+                        select.innerHTML += `<option value="${p.id}">${namaSlot} (${p.tipe_booking})</option>`;
+                    });
+                } else if (!isOptional) {
+                    select.innerHTML = '<option value="">Tidak ada slot kosong yang tersedia</option>';
+                }
+            });
+    }
+
+    // Helper fetch kendaraan unassigned
+    function fetchUnassignedVehicles(elementId) {
+        fetch("{{ route('kendaraan.unassigned') }}")
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById(elementId);
+                if(!select) return;
+                select.innerHTML = '<option value="">-- Pilih Kendaraan --</option>';
+                if (data.kendaraans && data.kendaraans.length > 0) {
+                    data.kendaraans.forEach(k => {
+                        select.innerHTML += `<option value="${k.id}">${k.merk} - ${k.nomor_plat} (${k.jenis_kendaraan})</option>`;
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Semua kendaraan sudah memiliki slot</option>';
+                }
+            });
+    }
+
+    // Kirim Data via Real-Time AJAX (Tanpa Reload)
+    function submitKendaraan(e) {
+        e.preventDefault();
+        const form = document.getElementById('formDaftarKendaraan');
+        const btn = document.getElementById('btnSubmitModal');
+        const formData = new FormData(form);
+
+        btn.disabled = true;
+        btn.innerText = 'Menyimpan...';
+
+        fetch(form.action, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Accept": "application/json"
+            },
+            body: formData
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                if (data.errors) {
+                    let errMessages = Object.values(data.errors).flat().join('\n');
+                    throw new Error(errMessages);
+                }
+                throw new Error(data.message || 'Gagal menyimpan data.');
+            }
+            return data;
+        })
         .then(data => {
-            selectSlot.innerHTML = '';
-            
-            if (data.slots && data.slots.length > 0) {
-                selectSlot.innerHTML = '<option value="">-- Pilih Slot Parkir --</option>';
-                data.slots.forEach(p => {
-                    // Ambil nama/kode slot dari relasi slotParkir
-                    let namaSlot = p.slot_parkir ? (p.slot_parkir.nama_slot || p.slot_parkir.kode_slot || ('Slot #' + p.slot_parkir.id)) : ('Pemesanan #' + p.id);
-                    let tipe = p.tipe_booking ? ` (${p.tipe_booking})` : '';
-                    
-                    selectSlot.innerHTML += `<option value="${p.id}">${namaSlot}${tipe}</option>`;
-                });
-            } else {
-                selectSlot.innerHTML = '<option value="">Anda belum memiliki slot parkir (Beli slot dulu)</option>';
+            btn.disabled = false;
+            btn.innerText = 'Simpan';
+
+            if (data.success) {
+                alert(data.message);
+                closeRegisterModal();
             }
         })
         .catch(err => {
-            console.error('Error:', err);
-            selectSlot.innerHTML = '<option value="">Gagal memuat slot parkir</option>';
+            btn.disabled = false;
+            btn.innerText = 'Simpan';
+            console.error('Error Submit:', err);
+            alert('Gagal:\n' + err.message);
         });
-}
-
-function closeRegisterModal() {
-    document.getElementById('registerModal').classList.add('hidden');
-    document.getElementById('formDaftarKendaraan').reset();
-}
-
-// Ubah fungsi trigger di tombol utama
-document.querySelectorAll("button[onclick*='registerModal']").forEach(btn => {
-    btn.setAttribute("onclick", "openRegisterModal()");
-});
-document.querySelectorAll("div[onclick*='registerModal']").forEach(div => {
-    div.setAttribute("onclick", "openRegisterModal()");
-});
-
-// Kirim Data via Real-Time AJAX (Tanpa Reload)
-function submitKendaraan(e) {
-    e.preventDefault();
-    const form = document.getElementById('formDaftarKendaraan');
-    const btn = document.getElementById('btnSubmitModal');
-    const formData = new FormData(form);
-
-    btn.disabled = true;
-    btn.innerText = 'Menyimpan...';
-
-    fetch(form.action, {
-        method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-            "Accept": "application/json"
-        },
-        body: formData
-    })
-    .then(async res => {
-        const data = await res.json();
-        if (!res.ok) {
-            // Jika validasi Laravel gagal (Error 422)
-            if (data.errors) {
-                let errMessages = Object.values(data.errors).flat().join('\n');
-                throw new Error(errMessages);
-            }
-            throw new Error(data.message || 'Gagal menyimpan data.');
-        }
-        return data;
-    })
-    .then(data => {
-        btn.disabled = false;
-        btn.innerText = 'Simpan Pendaftaran';
-
-        if (data.success) {
-            alert(data.message);
-            closeRegisterModal();
-            // Polling JS akan memperbarui daftar kendaraan secara real-time!
-        }
-    })
-    .catch(err => {
-        btn.disabled = false;
-        btn.innerText = 'Simpan Pendaftaran';
-        console.error('Error Submit:', err);
-        alert('Gagal:\n' + err.message);
-    });
-}
+    }
 </script>
 
 </body>

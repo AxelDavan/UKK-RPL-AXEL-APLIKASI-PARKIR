@@ -10,29 +10,32 @@ class LaporanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = LogAktivitas::with('user')->latest();
+        $filterTanggal = $request->input('tanggal', 'semua');
+        $filterAktivitas = $request->input('aktivitas', 'semua');
 
-        $filterTanggal = $request->get('tanggal', 'semua');
-            if ($filterTanggal === 'hari_ini') {
-                $query->whereDate('created_at', Carbon::today());
-            } elseif ($filterTanggal === 'minggu_ini') {
-                $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-            } elseif ($filterTanggal === 'bulan_in') {
-                $query->whereMonth('created_at', Carbon::now()->month)
-                      ->whereYear('created_at', Carbon::now()->year);
-            }
+        $query = LogAktivitas::with('user');
 
-        $filterAktivitas = $request->get('aktivitas', 'semua');
-            if ($filterAktivitas !== 'semua') {
-                $query->where('kategori', $filterAktivitas);
-            }
-        
-        $logs = $query->paginate(10)->withQueryString();
+        // Filter Berdasarkan Tanggal
+        if ($filterTanggal == 'hari_ini') {
+            $query->whereDate('created_at', Carbon::today());
+        } elseif ($filterTanggal == 'minggu_ini') {
+            $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+        } elseif ($filterTanggal == 'bulan_ini') {
+            $query->whereMonth('created_at', Carbon::now()->month);
+        }
 
-        return view('dashboard.petugas.laporan', compact(
-            'logs',
-            'filterTanggal',
-            'filterAktivitas'
-        ));
+        // Filter Aktivitas (Aman dari error kolom, ngecek teks umum)
+        if ($filterAktivitas != 'semua') {
+            $query->where(function($q) use ($filterAktivitas) {
+                $q->where('aktivitas', 'like', '%' . $filterAktivitas . '%');
+                if (\Schema::hasColumn('log_aktivitas', 'kategori')) {
+                    $q->orWhere('kategori', 'like', '%' . $filterAktivitas . '%');
+                }
+            });
+        }
+
+        $logs = $query->latest()->paginate(10)->withQueryString();
+
+        return view('dashboard.petugas.laporan', compact('logs', 'filterTanggal', 'filterAktivitas'));
     }
 }

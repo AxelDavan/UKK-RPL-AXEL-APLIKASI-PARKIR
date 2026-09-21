@@ -54,4 +54,25 @@ class User extends Authenticatable
     {
         return $this->hasMany(KunjunganTamu::class);
     }
+
+    public function chats()
+    {
+        return $table = $this->hasMany(\App\Models\Chat::class, 'user_id');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($user) {
+            // Cari pemesanan aktif milik user ini, lalu balikin slotnya jadi tersedia
+            $pemesanan = \App\Models\Pemesanan::where('user_id', $user->id)->get();
+            
+            foreach ($pemesanan as $p) {
+                if ($p->slot_parkir_id) {
+                    \App\Models\SlotParkir::where('id', $p->slot_parkir_id)->update([
+                        'status' => 'tersedia'
+                    ]);
+                }
+            }
+        });
+    }
 }

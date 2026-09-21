@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -112,8 +111,8 @@
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
         .parking-slot { transition: all 0.2s ease-in-out; cursor: pointer; }
         .parking-slot:hover { transform: scale(1.05); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .slot-available { background-color: #d1fae5; border-color: #10b981; } /* Light green background, emerald border */
-        .slot-occupied { background-color: #fee2e2; border-color: #ef4444; } /* Light red background, red border */
+        .slot-available { background-color: #d1fae5; border-color: #10b981; }
+        .slot-occupied { background-color: #fee2e2; border-color: #ef4444; }
     </style>
 </head>
 <body class="flex bg-background text-on-background min-h-screen overflow-hidden">
@@ -136,9 +135,8 @@
     <!-- MENU UTAMA -->
     <div class="flex-1 flex flex-col gap-1">
 
-        <!-- DASHBOARD - AKTIF -->
+        <!-- DASHBOARD -->
         <a
-            
             href="{{ route('dashboard') }}"
             class="flex items-center gap-4
                    px-4 py-3 mx-2 rounded-lg
@@ -146,7 +144,7 @@
                    {{ request()->routeIs('dashboard')
                         ? 'bg-secondary-container text-on-secondary-container font-bold'
                         : 'text-on-surface-variant' }}"
-        ></>
+        >
             <span
                 class="material-symbols-outlined"
                 style="font-variation-settings: 'FILL' 1;"
@@ -322,6 +320,15 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
+        <!-- BANTUAN -->
+        <a class="flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary transition-colors" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-lg text-label-lg">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
+
         <!-- LOGOUT -->
         <form
             method="POST"
@@ -352,37 +359,14 @@
     </div>
 
 </nav>
+
 <!-- Main Content Area -->
 <main class="ml-64 flex-1 flex flex-col h-screen overflow-y-auto">
-<!-- TopNavBar (Shared Component Contextual Adapter) -->
-<header class="flex justify-between items-center w-full px-margin-desktop h-16 bg-surface border-b border-outline-variant shadow-sm z-40 sticky top-0">
-<div class="flex items-center gap-md">
-<h2 class="font-title-lg text-title-lg text-on-surface font-semibold">Parking Monitor</h2>
-<div class="h-6 w-px bg-outline-variant mx-sm"></div>
-<span class="flex items-center gap-xs px-sm py-xs bg-surface-container-highest rounded-full font-label-md text-label-md text-on-surface-variant">
-<span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-                     Live Sync
-                 </span>
-</div>
-<!-- Search & Actions -->
-<div class="flex items-center gap-lg">
-<div class="relative hidden lg:block w-64">
-<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
-<input class="w-full pl-xl pr-md py-sm bg-surface-container rounded-lg border-none text-body-md focus:ring-2 focus:ring-primary transition-shadow" placeholder="Search vehicle or slot..." type="text"/>
-</div>
-<div class="flex items-center gap-sm">
-</div>
-</div>
-</header>
-<!-- Canvas -->
+
 <div class="p-margin-desktop flex-1 flex flex-col gap-lg bg-[#f8fafc]">
-<!-- Bento Grid Layout -->
 <div class="grid grid-cols-12 gap-gutter flex-1">
-<!-- Left Column: Stats & Map (Spans 9 cols) -->
 <div class="col-span-12 lg:col-span-8 xl:col-span-9 flex flex-col gap-lg">
-<!-- Top Row: Quick Stats -->
 <div class="grid grid-cols-3 gap-gutter h-32">
-<!-- Stat Card 1 -->
 <div class="bg-surface rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-outline-variant flex items-center justify-between relative overflow-hidden">
 <div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-xl"></div>
 <div>
@@ -393,7 +377,7 @@
 <span class="material-symbols-outlined text-primary text-[28px]">garage</span>
 </div>
 </div>
-<!-- Stat Card 2 -->
+
 <div class="bg-surface rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-[#10b981] border-l-4 flex items-center justify-between">
 <div>
 <p class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider mb-xs">Tersedia</p>
@@ -406,7 +390,7 @@
 <span class="material-symbols-outlined text-[#059669] text-[28px]">check_circle</span>
 </div>
 </div>
-<!-- Stat Card 3 -->
+
 <div class="bg-surface rounded-xl p-lg shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-[#ef4444] border-l-4 flex items-center justify-between">
 <div>
 <p class="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider mb-xs">Terisi</p>
@@ -417,16 +401,14 @@
 </div>
 </div>
 </div>
-<!-- Main Map Area -->
+
 <div class="flex-1 bg-surface rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-outline-variant flex flex-col overflow-hidden relative">
-<!-- Header & Filter Tombol Lantai -->
 <div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest z-10">
     <h3 class="font-title-md text-title-md text-on-surface flex items-center gap-sm">
         <span class="material-symbols-outlined text-primary">map</span>
         {{ $lantai === 'VIP' ? 'VIP Sector Overview' : ($lantai === 'B' ? 'Lantai 2 Overview' : 'Lantai 1 Overview') }}
     </h3>
 
-    <!-- Filter Buttons -->
     <div class="flex gap-sm">
         <a href="{{ route('parkir', ['level' => 'A']) }}" 
            class="px-md py-xs rounded-md font-label-md text-label-md transition-colors {{ $lantai === 'A' ? 'bg-secondary-container text-on-secondary-container font-bold shadow-sm' : 'bg-surface text-on-surface-variant border border-outline-variant hover:bg-surface-container-high' }}">
@@ -444,13 +426,12 @@
         </a>
     </div>
 </div>
-<!-- Map Container -->
+
 <div class="grid grid-cols-10 gap-2 p-2">
     @forelse($slots as $slot)
         @php
             $status = strtolower($slot->status ?? '');
             
-            // Pengecekan kondisi status slot
             $isTerisi  = in_array($status, ['terisi', 'occupied']);
             $isDipesan = in_array($status, ['dipesan', 'reserved', 'booking']);
             $isMaint   = in_array($status, ['maintenance', 'perbaikan', 'rusak']);
@@ -481,7 +462,7 @@
         <div class="col-span-10 text-center text-sm text-gray-500 py-8">Belum ada data slot.</div>
     @endforelse
 </div>
-<!-- Map Legend -->
+
 <div class="px-lg py-sm border-t border-outline-variant bg-surface-container-lowest flex items-center justify-end gap-lg">
 <div class="flex items-center gap-xs">
 <div class="w-4 h-4 rounded-sm bg-[#d1fae5] border border-[#10b981]"></div>
@@ -498,13 +479,11 @@
 </div>
 </div>
 </div>
-<!-- Right Column: Details Sidebar -->
+
 <div class="col-span-12 lg:col-span-4 xl:col-span-3 flex flex-col gap-lg">
     
-    <!-- Right Column: Details Sidebar -->
 <div class="col-span-12 lg:col-span-4 xl:col-span-3 flex flex-col gap-lg">
     
-    <!-- 1. SLOT INFO CARD -->
     <div class="glass-panel rounded-xl p-lg shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-outline-variant relative overflow-hidden transition-all duration-300" id="vehicle-details">
         <div class="absolute top-0 left-0 w-full h-2 bg-primary"></div>
         <div class="flex justify-between items-start mb-md mt-sm">
@@ -514,7 +493,6 @@
             </span>
         </div>
 
-        <!-- Detail Kendaraan -->
         <div class="space-y-sm">
             <div class="flex flex-col border-b border-outline-variant pb-sm">
                 <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">LICENSE PLATE</span>
@@ -553,7 +531,6 @@
         </div>
     </div>
 
-    <!-- 2. RECENT ACTIVITY CARD -->
     <div class="bg-surface rounded-xl flex-1 shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-outline-variant flex flex-col overflow-hidden">
         <div class="px-md py-sm border-b border-outline-variant bg-surface-container-lowest">
             <h3 class="font-title-md text-title-md text-on-surface">Recent Activity</h3>
@@ -604,6 +581,9 @@
 </div>
 </div>
 </main>
+
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
+
 <script>
 async function loadSlotDetail(slotId) {
     const panel = document.getElementById('vehicle-details');
@@ -640,6 +620,43 @@ document.addEventListener('DOMContentLoaded', function () {
         @endphp
         loadSlotDetail({{ $firstSlot->id }});
     @endif
+
+    const bantuanBadge = document.getElementById('bantuanBadge');
+    const notifSound = document.getElementById('notifSound');
+    let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+    async function checkNewMessages() {
+      try {
+        const response = await fetch("{{ route('admin.bantuan.users') }}");
+        if (!response.ok) return;
+
+        const users = await response.json();
+
+        if (users.length > 0) {
+          let latestChatId = 0;
+          users.forEach(u => {
+            if (u.last_chat_id > latestChatId) {
+              latestChatId = u.last_chat_id;
+            }
+          });
+
+          if (latestChatId > lastChatId) {
+            if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+            if (notifSound) {
+              notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            lastChatId = latestChatId;
+            localStorage.setItem('last_seen_chat_id', lastChatId);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengecek notifikasi pesan:", err);
+      }
+    }
+
+    setInterval(checkNewMessages, 3000);
 });
 </script>
 </body></html>

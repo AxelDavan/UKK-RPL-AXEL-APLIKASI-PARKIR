@@ -76,17 +76,52 @@
             <p class="font-bold text-slate-800 mt-1">SIMPAN TIKET INI HINGGA KELUAR GERBANG</p>
         </div>
     </div>
-
-    <!-- Tombol Navigasi -->
-    <div class="mt-6 flex gap-3 w-80">
-        <a href="{{ route('karsuk') }}" class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm">
-            <span class="material-symbols-outlined text-[18px]">add_card</span>
-            Buat Karcis Lagi
-        </a>
-        <a href="{{ route('tamu') }}" class="flex items-center justify-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all text-sm">
-            Daftar Tamu
-        </a>
+    
+    <!-- Tombol Navigasi & Print -->
+    <div class="mt-6 flex flex-col gap-3 w-80 print:hidden">
+        <div class="flex gap-3">
+            <a href="{{ route('karsuk') }}" class="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm">
+                <span class="material-symbols-outlined text-[18px]">add_card</span>
+                Buat Karcis Lagi
+            </a>
+            <a href="{{ route('tamu') }}" class="flex items-center justify-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all text-sm">
+                Daftar Tamu
+            </a>
+        </div>
+        
+        <!-- Tombol Print Khusus Struk -->
+        <button onclick="window.print()" class="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm">
+            <span class="material-symbols-outlined text-[18px]">print</span>
+            Cetak Karcis (Print)
+        </button>
     </div>
+
+    <!-- CSS Khusus untuk Print Thermal -->
+    <style>
+        @media print {
+            body {
+                background: white !important;
+                display: block !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            /* Sembunyikan semua elemen kecuali kartu struk */
+            .print\:hidden {
+                display: none !important;
+            }
+            /* Bikin ukuran kartu pas buat printer thermal kertas */
+            div.w-80 {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        }
+    </style>
+</body>
+</html>
 
 </body>
 </html>

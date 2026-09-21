@@ -135,7 +135,7 @@
             <span class="material-symbols-outlined">person</span>
             <span class="font-title-md text-title-md">Profile</span>
         </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="#">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
             <span class="material-symbols-outlined">help</span>
             <span class="font-title-md text-title-md">Bantuan</span>
         </a>

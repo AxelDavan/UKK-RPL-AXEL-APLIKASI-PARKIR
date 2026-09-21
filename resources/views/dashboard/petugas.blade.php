@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -328,7 +327,14 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
-
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-title-md text-title-md">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
+        
         <!-- LOGOUT -->
         <form
             method="POST"
@@ -359,6 +365,7 @@
     </div>
 
 </nav>
+
 <!-- Main Content -->
 <main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop overflow-y-auto w-full">
 <!-- Header section -->
@@ -372,6 +379,7 @@
 <div class="hidden md:flex gap-sm">
 </div>
 </div>
+
 <!-- Dashboard Grid -->
 <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
 <!-- Stats Row (Spans 12 cols, grid inside) -->
@@ -385,7 +393,7 @@
 </div>
 </div>
 <div class="mt-md">
-<h3 class="font-display-lg text-display-lg text-on-surface">{{ number_format($totalKendaraan) }}</h3>
+<h3 class="font-display-lg text-display-lg text-on-surface" id="stat-kendaraan-dalam">{{ number_format($totalKendaraan) }}</h3>
 <p class="font-label-md text-label-md text-tertiary mt-xs"></p>
 </div>
 </div>
@@ -411,7 +419,7 @@
 </div>
 </div>
 <div class="mt-md">
-<h3 class="font-display-lg text-display-lg text-error">{{ number_format($menungguVerifikasi) }}</h3>
+<h3 class="font-display-lg text-display-lg text-error" id="stat-menunggu-verifikasi">{{ number_format($menungguVerifikasi) }}</h3>
 <p class="font-label-md text-label-md text-error mt-xs"></p>
 </div>
 </div>
@@ -424,12 +432,13 @@
 </div>
 </div>
 <div class="mt-md">
-<h3 class="font-display-lg text-display-lg text-on-surface">{{ number_format($tamuHariIni) }}</h3>
+<h3 class="font-display-lg text-display-lg text-on-surface" id="stat-tamu-hari-ini">{{ number_format($tamuHariIni) }}</h3>
 <p class="font-label-md text-label-md text-tertiary mt-xs"></p>
 </div>
 </div>
 </div>
-<!-- Main Section Left (Actions) Spans 8 cols -->
+
+<!-- Main Section Left Spans 8 cols -->
 <div class="col-span-1 md:col-span-8 flex flex-col gap-lg">
 <div class="bg-surface rounded-xl p-lg shadow-sm border border-outline-variant/30">
 <h3 class="font-title-lg text-title-lg text-on-surface mb-md">Quick Actions</h3>
@@ -452,26 +461,102 @@
 </a>
 </div>
 </div>
-<!-- Additional Content Area (Camera Feed placeholder for context) -->
+
+<!-- KAMPASITAS SLOT PARKIR PER BLOK -->
 <div class="bg-surface rounded-xl p-lg shadow-sm border border-outline-variant/30">
-<div class="flex justify-between items-center mb-md">
-<h3 class="font-title-lg text-title-lg text-on-surface">Live CCTV (Gate 1)</h3>
-<span class="bg-error/10 text-error px-sm py-xs rounded-full font-label-md text-label-md flex items-center gap-xs">
-<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
-                                LIVE
+<div class="flex justify-between items-center mb-lg">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Kapasitas Parkir per Blok</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Ketersediaan area parkir apartemen secara real-time</p>
+</div>
+<span class="bg-primary/10 text-primary px-sm py-xs rounded-full font-label-md text-label-md flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                LIVE MONITOR
                             </span>
 </div>
-<div class="bg-surface-container-highest rounded-lg w-full h-64 flex items-center justify-center border border-outline-variant/50 relative overflow-hidden">
-<img alt="CCTV Feed" class="w-full h-full object-cover absolute inset-0 opacity-80" data-alt="A high-quality, realistic CCTV camera feed showing the entrance gate of a modern corporate building on a bright morning. A sleek black sedan is approaching the barrier. The lighting is natural and clear, indicating a light-mode UI context. The scene implies vigilant security monitoring." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4NwE0FmYByYTiUcOtJLFehcTLs4pwbBmNByZubIg_jaFdvW8jW-EkE-592HfjsdSBMg3mtdiAyH_9NfXz-DHfynfTaRxm02Ht_xy8AnOy_iKyBiMnXwYjDSI5FlY83pt88QVNJ-6_Pvq_qSvcus0ldhySlay_EpvVYkJD72VLQn67QW0otOZ2dcFALXBUBYwctylMmyFa3S38EWz-CWaZb6WHXW655rrddN0Xnt37ogmhu6O3eqWyeg"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-<div class="absolute bottom-4 left-4 text-white">
-<p class="font-label-md text-label-md">Gate 1 - Main Entrance</p>
-<p class="font-label-md text-label-md opacity-75">10/24/2023 08:42:15 AM</p>
+
+<div class="flex flex-col gap-md">
+    <!-- Lantai 1 -->
+    @php
+        $terisiL1 =$kapasitasL1Terisi ?? 32;
+        $totalL1 =$totalL1Kapasitas ?? 50;
+        $persenL1 = min(100, round(($terisiL1 / max(1,$totalL1)) * 100));
+    @endphp
+    <div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30">
+        <div class="flex justify-between items-center mb-xs">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary"></span>
+                <span class="font-title-md text-title-md text-on-surface">Lantai 1</span>
+            </div>
+            <span class="font-label-lg text-label-lg text-on-surface-variant">
+                <strong class="text-on-surface">{{ $terisiL1 }}</strong> / {{$totalL1 }} Slot
+            </span>
+        </div>
+        <div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500 {{ $persenL1 >= 90 ? 'bg-error' : ($persenL1 >= 70 ? 'bg-amber-500' : 'bg-primary') }}" style="width: {{ $persenL1 }}%;"></div>
+        </div>
+        <div class="flex justify-between items-center mt-xs">
+            <span class="font-label-md text-label-md text-on-surface-variant">Terisi {{ $persenL1 }}%</span>
+            <span class="font-label-md text-label-md text-emerald-600 font-semibold">Sisa {{ max(0, $totalL1 -$terisiL1) }} Slot</span>
+        </div>
+    </div>
+
+    <!-- Lantai 2 -->
+    @php
+        $terisiL2 =$kapasitasL2Terisi ?? 18;
+        $totalL2 =$totalL2Kapasitas ?? 50;
+        $persenL2 = min(100, round(($terisiL2 / max(1,$totalL2)) * 100));
+    @endphp
+    <div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30">
+        <div class="flex justify-between items-center mb-xs">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary"></span>
+                <span class="font-title-md text-title-md text-on-surface">Lantai 2</span>
+            </div>
+            <span class="font-label-lg text-label-lg text-on-surface-variant">
+                <strong class="text-on-surface">{{ $terisiL2 }}</strong> / {{$totalL2 }} Slot
+            </span>
+        </div>
+        <div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500 {{ $persenL2 >= 90 ? 'bg-error' : ($persenL2 >= 70 ? 'bg-amber-500' : 'bg-primary') }}" style="width: {{ $persenL2 }}%;"></div>
+        </div>
+        <div class="flex justify-between items-center mt-xs">
+            <span class="font-label-md text-label-md text-on-surface-variant">Terisi {{ $persenL2 }}%</span>
+            <span class="font-label-md text-label-md text-emerald-600 font-semibold">Sisa {{ max(0, $totalL2 -$terisiL2) }} Slot</span>
+        </div>
+    </div>
+
+    <!-- Area VIP -->
+    @php
+        $terisiVIP =$kapasitasVIPTerisi ?? 10;
+        $totalVIP =$totalVIPKapasitas ?? 10;
+        $persenVIP = min(100, round(($terisiVIP / max(1,$totalVIP)) * 100));
+    @endphp
+    <div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant/30">
+        <div class="flex justify-between items-center mb-xs">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary"></span>
+                <span class="font-title-md text-title-md text-on-surface">Area VIP</span>
+            </div>
+            <span class="font-label-lg text-label-lg text-on-surface-variant">
+                <strong class="text-on-surface">{{ $terisiVIP }}</strong> / {{$totalVIP }} Slot
+            </span>
+        </div>
+        <div class="w-full bg-surface-container-high h-3 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500 {{ $persenVIP >= 90 ? 'bg-error' : 'bg-amber-500' }}" style="width: {{ $persenVIP }}%;"></div>
+        </div>
+        <div class="flex justify-between items-center mt-xs">
+            <span class="font-label-md text-label-md text-on-surface-variant">Terisi {{ $persenVIP }}%</span>
+            <span class="font-label-md text-label-md {{ $totalVIP -$terisiVIP <= 0 ? 'text-error font-bold' : 'text-emerald-600 font-semibold' }}">
+                {{ $totalVIP -$terisiVIP <= 0 ? 'Penuh' : 'Sisa ' . ($totalVIP -$terisiVIP) . ' Slot' }}
+            </span>
+        </div>
+    </div>
 </div>
 </div>
 </div>
-</div>
-<!-- Sidebar Right (Activity Feed) Spans 4 cols -->
+
+<!-- Sidebar Right Spans 4 cols -->
 <div class="col-span-1 md:col-span-4 bg-surface rounded-xl p-lg shadow-sm border border-outline-variant/30 h-fit" id="recent-activity-container">
 <h3 class="font-title-lg text-title-lg text-on-surface mb-lg">Recent Activity</h3>
 <div class="flex flex-col gap-md">
@@ -482,13 +567,13 @@
                     </button>
 </div>
 </div>
-<!-- Padding for bottom nav on mobile -->
+
 <div class="h-24 md:hidden"></div>
 </main>
 </div>
+
 <!-- BottomNavBar (Mobile Only) -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-sm bg-surface dark:bg-surface-container border-t border-outline-variant dark:border-outline shadow-lg rounded-t-xl">
-<!-- Beranda - Active -->
 <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-lg py-xs scale-90 transition-transform" href="{{ route('dashboard') }}">
 <span class="material-symbols-outlined fill-icon" data-icon="home">home</span>
 <span class="font-label-md text-label-md-mobile mt-xs">Beranda</span>
@@ -510,7 +595,7 @@
 <span class="font-label-md text-label-md-mobile mt-xs">Profil</span>
 </a>
 </nav>
-<!-- POPUP & AUDIO LOGIN (Hanya muncul sekali saat login) -->
+
 @if(session('login_success'))
     <div id="loginSuccessPopup" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
         <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 text-center">
@@ -550,12 +635,11 @@
     </script>
 @endif
 
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
 
-<!-- SCRIPT JAM REAL-TIME & DASHBOARD STATS (Selalu berjalan di setiap page load) -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // 1. FUNGSI JAM & SHIFT REAL-TIME
     function updateLiveDateTime() {
         const now = new Date();
         const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -570,7 +654,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
 
-        // Menentukan Shift Berdasarkan Jam
         let shiftText = 'Sif Malam (22:00 - 06:00)';
         const currentHour = now.getHours();
         if (currentHour >= 6 && currentHour < 14) {
@@ -585,12 +668,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (liveElem) liveElem.innerText = formattedString;
     }
 
-    // Update jam setiap 1 detik
     setInterval(updateLiveDateTime, 1000);
     updateLiveDateTime();
 
-
-    // 2. FUNGSI RECENT ACTIVITY & STATS REAL-TIME
     async function updateDashboardData() {
         try {
             const response = await fetch("{{ route('petugas.dashboard.stats') }}");
@@ -629,9 +709,53 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Auto-refresh data tiap 3 detik
     setInterval(updateDashboardData, 3000);
     updateDashboardData();
+
+    const bantuanBadge = document.getElementById('bantuanBadge');
+    const notifSound = document.getElementById('notifSound');
+    let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+    async function checkNewMessages() {
+      try {
+        const response = await fetch("{{ route('admin.bantuan.users') }}");
+        if (!response.ok) return;
+
+        const users = await response.json();
+
+        if (users.length > 0) {
+          let latestChatId = 0;
+          users.forEach(u => {
+            if (u.last_chat_id > latestChatId) {
+              latestChatId = u.last_chat_id;
+            }
+          });
+
+          if (latestChatId > lastChatId) {
+            if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+            if (notifSound) {
+              notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            lastChatId = latestChatId;
+            localStorage.setItem('last_seen_chat_id', lastChatId);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengecek notifikasi pesan:", err);
+      }
+    }
+
+    setInterval(checkNewMessages, 3000);
+
+    const bantuanLink = document.querySelector('a[href="{{ route("admin.bantuan") }}"]');
+    if (bantuanLink) {
+      bantuanLink.addEventListener('click', function() {
+        if (bantuanBadge) bantuanBadge.classList.add('hidden');
+      });
+    }
 });
 </script>
-</body></html>
+</body>
+</html>

@@ -124,23 +124,6 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background min-h-screen font-body-md selection:bg-primary selection:text-on-primary antialiased">
-<!-- TopNavBar -->
-<header class="fixed top-0 right-0 w-[calc(100%-260px)] h-16 z-50 backdrop-blur-md border-b border-outline-variant bg-surface-container-lowest/80">
-<div class="flex justify-between items-center px-gutter max-w-container-max mx-auto h-full w-full">
-<!-- Search on left -->
-<div class="flex-1 max-w-md focus-within:ring-2 focus-within:ring-primary/20 transition-all rounded-lg overflow-hidden flex items-center bg-surface-container-low px-3 h-10">
-<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
-<input class="w-full bg-transparent border-none focus:ring-0 text-body-md text-on-surface placeholder:text-outline h-full" placeholder="Cari..." type="text"/>
-</div>
-<!-- Actions on right -->
-<div class="flex items-center gap-4">
-<a class="h-8 w-8 rounded-full overflow-hidden bg-surface-container border border-outline-variant ml-2" href="{{ route('profile.edit') }}">
-<img alt="Administrator Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a corporate administrator, bright even lighting, clean neutral background, sharp focus, modern corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVBfVeJ-79dbdwmEBKkKLi8_ZCGVxvkff85f-ApfJrlLP1JTkBnjn2og_CzjmG8cgNZndbdDOK3ZP9S443-hH8BY6S3u7dF3P448UbzUvFy3P0E7-UHPGwJJ_vfdkOSUCwngA1OHihm79wRgcgfO0FVsOoFuuJ1JuOLvwaTEAtMjOxrkDMTmbWInAitQEGa0tmTZ40x3DnZ8X3JBAs4DY_dm3HsE6a0q_NY1YOebuuk-63UNKQ31QD-g"/>
-</a>
-</div>
-</div>
-</header>
 <!-- ================= SIDEBAR SAFE PARK ================= -->
 <nav
     class="bg-surface-container-lowest
@@ -317,21 +300,21 @@
             
 
 
-            <!-- Bantuan -->
+            <!-- Profile -->
             <li>
                 <a
-                    href="#"
+                    href="{{ route('profile.edit') }}"
                     class="flex items-center gap-3 px-6 py-3
                            text-on-surface-variant
                            hover:bg-surface-container
                            transition-colors"
                 >
                     <span class="material-symbols-outlined">
-                        help
+                        person
                     </span>
 
                     <span class="font-body-sm text-body-sm">
-                        Bantuan
+                        Profile
                     </span>
                 </a>
             </li>

@@ -64,51 +64,99 @@ class KendaraanOwnerController extends Controller
         }
     }
 
-    public function store(Request $request)
+public function store(Request $request)
     {
-        // Validasi sesuai kolom di DB kamu
-        $request->validate([
-            'nomor_plat' => 'required|string|max:20|unique:kendaraans,nomor_plat',
-            'merk' => 'required|string|max:100',
-            'warna' => 'required|string|max:50',
-            'jenis_kendaraan' => 'required|in:mobil,motor,truk',
-            'pemesanan_id' => 'required',
-        ]);
+        // Cek jika ini mode ASSIGN KENDARAAN EKSISTING KE SLOT
+        if ($request->has('kendaraan_id') && !$request->has('nomor_plat')) {
+            $request->validate([
+                'pemesanan_id' => 'required|exists:pemesanans,id',
+                'kendaraan_id' => 'required|exists:kendaraans,id',
+            ]);
 
-        // Ambil data pemesanan untuk dapatkan slot_parkir_id
-        $pemesanan = Pemesanan::find($request->pemesanan_id);
-        $slotParkirId = $pemesanan ? $pemesanan->slot_parkir_id : null;
+            $pemesanan = Pemesanan::findOrFail($request->pemesanan_id);
+            $kendaraan = Kendaraan::findOrFail($request->kendaraan_id);
+            $slotParkirId = $pemesanan->slot_parkir_id;
 
-        $kendaraan = Kendaraan::create([
-            'user_id' => Auth::id(), // terisi otomatis dari session user login
-            'nomor_plat' => strtoupper($request->nomor_plat),
-            'merk' => $request->merk,
-            'warna' => $request->warna,
-            'jenis_kendaraan' => strtolower($request->jenis_kendaraan),
-            'status' => 'menunggu',
-            'slot_parkir_id' => $slotParkirId,
-        ]);
+            // Update kendaraan agar terikat ke slot parkir baru
+            $kendaraan->update([
+                'slot_parkir_id' => $slotParkirId,
+                'status'         => 'disetujui'
+            ]);
 
-        if ($slotParkirId) {
-            SlotParkir::where('id', $slotParkirId)->update([
-                'status' => 'terisi'
+            // Update pemesanan agar terikat ke kendaraan ini
+            $pemesanan->update([
+                'kendaraan_id' => $kendaraan->id
+            ]);
+
+            // Ubah status slot jadi terisi
+            if ($slotParkirId) {
+                SlotParkir::where('id', $slotParkirId)->update([
+                    'status' => 'terisi'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kendaraan berhasil ditempatkan ke slot parkir!'
+            ]);
+        } 
+        
+        // Jika ini mode DAFTARKAN KENDARAAN BARU
+        else {
+            $request->validate([
+                'nomor_plat'      => 'required|string|max:20|unique:kendaraans,nomor_plat',
+                'merk'            => 'required|string|max:100',
+                'warna'           => 'required|string|max:50',
+                'jenis_kendaraan' => 'required|in:mobil,motor,truk',
+                'pemesanan_id'    => 'nullable',
+            ]);
+
+            $slotParkirId = null;
+            $pemesanan = null;
+
+            if ($request->filled('pemesanan_id')) {
+                $pemesanan = Pemesanan::find($request->pemesanan_id);
+                $slotParkirId = $pemesanan ? $pemesanan->slot_parkir_id : null;
+            }
+
+            $kendaraan = Kendaraan::create([
+                'user_id'         => Auth::id(),
+                'nomor_plat'      => strtoupper($request->nomor_plat),
+                'merk'            => $request->merk,
+                'warna'           => $request->warna,
+                'jenis_kendaraan' => strtolower($request->jenis_kendaraan),
+                'status'          => 'menunggu',
+                'slot_parkir_id'  => $slotParkirId,
+            ]);
+
+            if ($pemesanan) {
+                if ($slotParkirId) {
+                    SlotParkir::where('id', $slotParkirId)->update([
+                        'status' => 'terisi'
+                    ]);
+                }
+                $pemesanan->update([
+                    'kendaraan_id' => $kendaraan->id
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kendaraan baru berhasil didaftarkan!',
+                'data'    => $kendaraan
             ]);
         }
+    }
 
-        $pemesanan->update([
-            'kendaraan_id' => $kendaraan->id
-        ]);
-
-        if ($pemesanan->slot_parkir_id) {
-            SlotParkir::where('id', $pemesanan->slot_parkir_id)->update([
-                'status' => 'terisi'
-            ]);
-        }
+    public function getUnassignedVehicles()
+    {
+        $kendaraans = Kendaraan::where('user_id', Auth::id())
+            ->whereNull('slot_parkir_id')
+            ->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Kendaraan berhasil didaftarkan!',
-            'data' => $kendaraan
+            'kendaraans' => $kendaraans
         ]);
     }
 

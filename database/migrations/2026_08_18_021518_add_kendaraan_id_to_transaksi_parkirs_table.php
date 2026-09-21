@@ -8,12 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('transaksi_parkirs', function (Blueprint $table) {
-            $table->foreignId('kendaraan_id')
-                ->after('user_id')
-                ->constrained('kendaraans')
-                ->cascadeOnDelete();
-        });
+        // Kosongkan karena kolom kendaraan_id sudah ada di database/tabel utama
     }
 
     public function down(): void

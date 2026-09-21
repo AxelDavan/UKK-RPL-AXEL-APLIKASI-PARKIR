@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
           darkMode: "class",
@@ -113,6 +112,7 @@
     </style>
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row font-body-md overflow-x-hidden">
+
 <!-- SIDEBAR DESKTOP -->
 <nav class="hidden md:flex flex-col h-full py-6 w-64 fixed left-0 top-0
             bg-surface-container-low
@@ -133,9 +133,8 @@
     <!-- MENU UTAMA -->
     <div class="flex-1 flex flex-col gap-1">
 
-        <!-- DASHBOARD - AKTIF -->
+        <!-- DASHBOARD -->
         <a
-            
             href="{{ route('dashboard') }}"
             class="flex items-center gap-4
                    px-4 py-3 mx-2 rounded-lg
@@ -143,7 +142,7 @@
                    {{ request()->routeIs('dashboard')
                         ? 'bg-secondary-container text-on-secondary-container font-bold'
                         : 'text-on-surface-variant' }}"
-        ></>
+        >
             <span
                 class="material-symbols-outlined"
                 style="font-variation-settings: 'FILL' 1;"
@@ -319,7 +318,14 @@
                 border-t border-outline-variant
                 pt-2 mx-2">
 
-
+        <!-- BANTUAN -->
+        <a class="flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:text-primary transition-colors" href="{{ route('admin.bantuan') }}">
+            <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined">help</span>
+                <span class="font-label-lg text-label-lg">Bantuan</span>
+            </div>
+            <span id="bantuanBadge" class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse hidden"></span>
+        </a>
 
         <!-- LOGOUT -->
         <form
@@ -351,7 +357,7 @@
     </div>
 
 </nav>
-<!-- TopNavBar (Mobile) -->
+
 <header class="md:hidden flex justify-between items-center w-full px-margin-mobile h-16 bg-surface dark:bg-surface-container-low shadow-sm z-30 fixed top-0 left-0">
 <div class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-inverse-primary tracking-tight">Safe Park</div>
 <div class="flex gap-md text-primary dark:text-inverse-primary">
@@ -359,7 +365,7 @@
 <button aria-label="Account" class="hover:bg-surface-container-highest p-2 rounded-full transition-colors"><span class="material-symbols-outlined">account_circle</span></button>
 </div>
 </header>
-<!-- Main Content Area -->
+
 <main class="flex-grow pt-20 md:pt-8 px-margin-mobile md:px-margin-desktop md:ml-64 pb-24 md:pb-8 w-full max-w-[1600px] mx-auto">
 <header class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
 <div>
@@ -372,7 +378,7 @@
 <button class="flex-1 md:flex-none px-6 py-2 rounded-md text-on-surface-variant hover:bg-surface-variant font-label-lg text-label-lg transition-colors">Ditolak ({{ number_format($countDitolak) }})</button>
 </div>
 </header>
-<!-- Search & Filter Bar -->
+
 <form method="GET" action="{{ route('verifikasi') }}" class="bg-surface rounded-xl p-4 mb-8 card-shadow flex flex-col md:flex-row gap-4 items-center border border-outline-variant/30">
 <input type="hidden" name="status" value="{{ $status }}">
 <div class="relative w-full md:w-96">
@@ -386,12 +392,11 @@
                 </button>
 </div>
 </form>
-<!-- Verification Cards Grid -->
+
 <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-gutter" id="cardGrid">
     @forelse($permohonan as $item)
         <div class="bg-surface rounded-[16px] p-[24px] card-shadow card-hover border border-outline-variant/20 flex flex-col h-full relative overflow-hidden transition-all duration-300" id="card-{{ $item->id }}">
             
-            <!-- Indicator Line Color -->
             <div class="absolute top-0 left-0 w-full h-1 {{ $item->status === 'menunggu' ? 'bg-[#fbbf24]' : ($item->status === 'disetujui' ? 'bg-[#16a34a]' : 'bg-error') }}"></div>
 
             <div class="flex justify-between items-start mb-6">
@@ -405,7 +410,6 @@
                     </div>
                 </div>
 
-                <!-- Status Badge -->
                 @if($item->status === 'menunggu')
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#fef3c7] text-[#92400e] font-label-lg text-label-lg border border-[#fde68a]">
                         <span class="w-1.5 h-1.5 rounded-full bg-[#d97706]"></span> Menunggu Verifikasi
@@ -437,7 +441,7 @@
                 </div>
                 <div>
                     <p class="font-label-md text-label-md text-outline mb-1">Merk / Warna</p>
-                    <p class="font-body-md text-body-md">{{ $item->merk }} / {{ $item->warna }}</p>
+                    <p class="font-body-md text-body-md">{{ $item->merk }} / {{$item->warna }}</p>
                 </div>
                 <div>
                     <p class="font-label-md text-label-md text-outline mb-1">Tgl Pengajuan</p>
@@ -475,7 +479,7 @@
     @endforelse
 </div>
 </main>
-<!-- BottomNavBar (Mobile) -->
+
 <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile py-sm bg-surface dark:bg-surface-container border-t border-outline-variant dark:border-outline shadow-lg rounded-t-xl">
 <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant px-md py-xs hover:bg-surface-variant dark:hover:bg-surface-container-high rounded-full transition-colors group" href="{{ route('dashboard') }}">
 <span class="material-symbols-outlined group-hover:text-primary">home</span>
@@ -498,6 +502,10 @@
 <span class="font-label-md text-label-md-mobile mt-1">Profil</span>
 </a>
 </nav>
+
+<!-- ELEMENT AUDIO NOTIFIKASI -->
+<audio id="notifSound" src="{{ asset('audio/handoff.mp3') }}" preload="auto"></audio>
+
 <script>
 async function processVerification(id, newStatus) {
     if (!confirm(`Apakah Anda yakin ingin men-${newStatus} permohonan kendaraan ini?`)) {
@@ -518,7 +526,6 @@ async function processVerification(id, newStatus) {
         const result = await response.json();
 
         if (response.ok && result.success) {
-            // Hilangkan kartu kendaraan secara halus tanpa reload
             const card = document.getElementById(`card-${id}`);
             if (card) {
                 card.style.opacity = '0';
@@ -533,6 +540,53 @@ async function processVerification(id, newStatus) {
         alert('Terjadi kesalahan jaringan atau server.');
     }
 }
+
+// SCRIPT REAL-TIME CHECK NOTIFIKASI BANTUAN
+document.addEventListener('DOMContentLoaded', function () {
+    const bantuanBadge = document.getElementById('bantuanBadge');
+    const notifSound = document.getElementById('notifSound');
+    let lastChatId = localStorage.getItem('last_seen_chat_id') || 0;
+
+    async function checkNewMessages() {
+      try {
+        const response = await fetch("{{ route('admin.bantuan.users') }}");
+        if (!response.ok) return;
+
+        const users = await response.json();
+
+        if (users.length > 0) {
+          let latestChatId = 0;
+          users.forEach(u => {
+            if (u.last_chat_id > latestChatId) {
+              latestChatId = u.last_chat_id;
+            }
+          });
+
+          if (latestChatId > lastChatId) {
+            if (bantuanBadge) bantuanBadge.classList.remove('hidden');
+
+            if (notifSound) {
+              notifSound.play().catch(e => console.log("Audio play blocked by browser:", e));
+            }
+
+            lastChatId = latestChatId;
+            localStorage.setItem('last_seen_chat_id', lastChatId);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal mengecek notifikasi pesan:", err);
+      }
+    }
+
+    setInterval(checkNewMessages, 3000);
+
+    const bantuanLink = document.querySelector('a[href="{{ route("admin.bantuan") }}"]');
+    if (bantuanLink) {
+      bantuanLink.addEventListener('click', function() {
+        if (bantuanBadge) bantuanBadge.classList.add('hidden');
+      });
+    }
+});
 </script>
 
 </body></html>
