@@ -275,7 +275,7 @@
 <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter-lg max-w-max-width mx-auto px-gutter-lg">
 <div>
 <div class="font-title-lg text-title-lg font-bold text-primary dark:text-inverse-primary mb-4">Safe Park</div>
-<p class="font-body-md text-body-md text-on-surface-variant">© 2024 Safe Park. Hak cipta dilindungi undang-undang.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2026 SafePark. All rights reserved by Axel Davan Prayoga - SMK N1 SANDEN</p>
 </div>
 <div class="flex flex-col gap-2">
 <a class="text-on-surface-variant hover:text-primary font-body-md text-body-md transition-all hover:opacity-80" href="#">Produk</a>

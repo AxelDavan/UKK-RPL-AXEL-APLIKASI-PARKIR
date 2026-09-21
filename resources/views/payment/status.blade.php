@@ -239,7 +239,7 @@
   </main>
 
   <footer class="mt-8 text-center text-xs text-slate-400">
-    <p>© 2026 Safe Park — Smart Apartment Parking System. Hak cipta dilindungi.</p>
+    <p>© 2026 SafePark. All rights reserved by Axel Davan Prayoga - SMK N1 SANDEN</p>
   </footer>
 
 </body>
@@ -398,7 +398,7 @@
   </main>
 
   <footer class="mt-8 text-center text-xs text-slate-400">
-    <p>© 2026 Safe Park — Smart Apartment Parking System. Hak cipta dilindungi.</p>
+    <p>© 2026 SafePark. All rights reserved by Axel Davan Prayoga - SMK N1 SANDEN</p>
   </footer>
 
 </body>

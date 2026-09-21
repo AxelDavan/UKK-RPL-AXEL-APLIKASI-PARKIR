@@ -771,7 +771,7 @@
 
 <footer class="w-full bg-surface-container-lowest shadow-[0_-1px_8px_rgba(0,0,0,0.02)] py-md border-t border-outline-variant/30">
 <div class="w-full px-xl flex items-center justify-between font-label-md text-label-md text-on-surface-variant">
-<span>© 2024 Safe Park Pos Jaga. Apartemen Terpadu.</span>
+<span>© 2026 SafePark. All rights reserved by Axel Davan Prayoga - SMK N1 SANDEN</span>
 <div class="flex items-center gap-lg">
 <span>Gerbang: <strong class="text-on-surface font-semibold">Pos Gerbang Utama</strong></span>
 <span>Koneksi: <strong class="text-[#16a34a] font-semibold">Stabil (12ms)</strong></span>
