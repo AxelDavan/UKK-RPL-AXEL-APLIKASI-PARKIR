@@ -39,4 +39,14 @@ class Pemesanan extends Model
     {
         return $this->belongsTo(SlotParkir::class, 'slot_parkir_id');
     }
+
+    public function areaParkir()
+    {
+        return $this->belongsTo(AreaParkir::class);
+    }
+
+    public function statusPayment()
+    {
+        return $this->belongsTo(StatusPayment::class);
+    }
 }

@@ -15,8 +15,8 @@ class OwnerDashboardController extends Controller
     {
         $user = auth()->user();
 
-        // 1. Data Kendaraan Rendra
-        $kendaraanUser = Kendaraan::with('areaParkir')->where('user_id', $user->id)->get();
+        // 1. Data Kendaraan Owner
+        $kendaraanUser = Kendaraan::with('areaParkir', 'slotParkir')->where('user_id', $user->id)->get();
         $totalKendaraan = $kendaraanUser->count();
         $kendaraanIds  = $kendaraanUser->pluck('id');
         $platClean     = $kendaraanUser->pluck('nomor_plat')->map(fn($p) => str_replace(' ', '', $p));
@@ -28,41 +28,59 @@ class OwnerDashboardController extends Controller
 
         $tamuaktif = Tamu::where('user_id', $user->id)->count();
 
-        // 3. Cari Transaksi Parkir Aktif (Mendukung status 'aktif' maupun 'masuk' & abaikan spasi plat)
-        $parkiraktif = TransaksiParkir::with(['kendaraan', 'areaParkir'])
-            ->whereIn('status', ['aktif', 'masuk'])
-            ->where(function ($q) use ($user, $kendaraanIds, $platClean) {
-                $q->where('user_id', $user->id)
-                  ->orWhereIn('kendaraan_id', $kendaraanIds)
-                  ->orWhereIn(DB::raw("REPLACE(nomor_plat, ' ', '')"), $platClean);
-            })
-            ->latest('waktu_masuk')
+        // 3. Cari Transaksi Parkir / Pemesanan Slot Aktif Berdasarkan Relasi Slot yang Dipilih User
+        $parkiraktif = null;
+        if ($totalKendaraan > 0) {
+            // Cek dulu dari data transaksi parkir aktif
+            $parkiraktif = TransaksiParkir::with(['kendaraan', 'areaParkir'])
+                ->whereIn('status', ['aktif', 'masuk'])
+                ->where(function ($q) use ($kendaraanIds, $platClean) {
+                    $q->whereIn('kendaraan_id', $kendaraanIds)
+                      ->orWhereIn(DB::raw("REPLACE(nomor_plat, ' ', '')"), $platClean);
+                })
+                ->latest('waktu_masuk')
+                ->first();
+        }
+
+        // Jika tidak ada transaksi, cari pemesanan yang statusnya benar-benar aktif/terisi
+        if (!$parkiraktif && $totalKendaraan > 0) {
+            $kendaraanberisiSlot = Kendaraan::with(['slotParkir', 'areaParkir'])
+            ->where('user_id', $user->id)
+            ->whereNotNull('slot_parkir_id')
             ->first();
 
-        // 4. Fallback: Jika transaksi parkir belum tercatat, ambil dari Slot Parkir Kendaraan Rendra yang terisi
-        if (!$parkiraktif) {
-            $kendaraanParkir = $kendaraanUser->firstWhere(fn($k) => !is_null($k->slot_parkir_id));
-            if ($kendaraanParkir) {
+
+            // Kalau tidak ketemu yang status aktif, fallback ke relasi slot kendaraan utama
+            $kendaraanUtama = $kendaraanberisiSlot ?? $kendaraanUser->first();
+
+            $namaSlotAktif = 'Tower A (Slot Utama)';
+            if ($kendaraanUtama && $kendaraanUtama->slotParkir) {
+                $namaSlotAktif = $kendaraanUtama->slotParkir->kode_slot; // Ini akan menghasilkan 'A-01'
+            } elseif ($kendaraanUtama && $kendaraanUtama->areaParkir) {
+                $namaSlotAktif = $kendaraanUtama->areaParkir->nama_slot ?? $kendaraanUtama->areaParkir->nama_area;
+            }
+
+            if ($kendaraanUtama) {
                 $parkiraktif = (object) [
-                    'jenis_kendaraan' => $kendaraanParkir->merk ?? $kendaraanParkir->jenis_kendaraan ?? 'Motor',
-                    'nomor_plat'      => $kendaraanParkir->nomor_plat,
-                    'waktu_masuk'     => $kendaraanParkir->updated_at ?? now(),
+                    'jenis_kendaraan' => $kendaraanUtama->jenis_kendaraan ?? 'Mobil',
+                    'nomor_plat'      => $kendaraanUtama->nomor_plat ?? '-',
+                    'waktu_masuk'     => $kendaraanUtama->updated_at ?? $kendaraanUtama->created_at ?? now(),
                     'areaParkir'      => (object) [
-                        'nama_area' => 'Slot A-01'
+                        'nama_area'   => $namaSlotAktif
                     ]
                 ];
             }
         }
-
-        // 5. Riwayat Aktivitas
-        $aktivitas = TransaksiParkir::where(function ($q) use ($user, $kendaraanIds, $platClean) {
-                $q->where('user_id', $user->id)
-                  ->orWhereIn('kendaraan_id', $kendaraanIds)
-                  ->orWhereIn(DB::raw("REPLACE(nomor_plat, ' ', '')"), $platClean);
-            })
-            ->latest()
-            ->take(5)
-            ->get();
+        $aktivitas = collect();
+        if ($totalKendaraan > 0) {
+            $aktivitas = TransaksiParkir::where(function ($q) use ($kendaraanIds, $platClean) {
+                    $q->whereIn('kendaraan_id', $kendaraanIds)
+                      ->orWhereIn(DB::raw("REPLACE(nomor_plat, ' ', '')"), $platClean);
+                })
+                ->latest()
+                ->take(5)
+                ->get();
+        }
 
         return view('dashboard.owner', compact(
             'user',
@@ -100,15 +118,17 @@ class OwnerDashboardController extends Controller
 
         $tamuaktif = Tamu::where('user_id', $user->id)->count();
 
-        $parkiraktif = TransaksiParkir::with(['kendaraan', 'areaParkir'])
-            ->whereIn('status', ['aktif', 'masuk'])
-            ->where(function ($q) use ($user, $kendaraanIds, $platClean) {
-                $q->where('user_id', $user->id)
-                  ->orWhereIn('kendaraan_id', $kendaraanIds)
-                  ->orWhereIn(DB::raw("REPLACE(nomor_plat, ' ', '')"), $platClean);
-            })
-            ->latest('waktu_masuk')
-            ->first();
+        $parkiraktif = null;
+        if ($kendaraanUser->count() > 0) {
+            $parkiraktif = TransaksiParkir::with(['kendaraan', 'areaParkir'])
+                ->whereIn('status', ['aktif', 'masuk'])
+                ->where(function ($q) use ($kendaraanIds, $platClean) {
+                    $q->whereIn('kendaraan_id', $kendaraanIds)
+                      ->orWhereIn(DB::raw("REPLACE(nomor_plat, ' ', '')"), $platClean);
+                })
+                ->latest('waktu_masuk')
+                ->first();
+        }
 
         $waktuMasuk = null;
         if ($parkiraktif && $parkiraktif->waktu_masuk) {

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Safe Park - Beranda</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
@@ -108,7 +108,7 @@
 </head>
 <body class="bg-background text-on-background antialiased flex">
 
-<!-- SIDEBAR -->
+<!-- SIDEBAR DESKTOP (Tampil di layar besar) -->
 <nav class="bg-surface border-r border-outline-variant h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col">
     <div class="p-lg">
         <h1 class="font-title-lg text-title-lg font-bold text-primary">Safe Park</h1>
@@ -142,12 +142,58 @@
     </div>
 </nav>
 
+<!-- SIDEBAR MOBILE (Drawer tersembunyi yang bisa dibuka lewat tombol menu) -->
+<nav id="mobile-sidebar" class="bg-surface border-r border-outline-variant h-screen w-64 fixed left-0 top-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col md:hidden">
+    <div class="p-lg flex justify-between items-center">
+        <div>
+            <h1 class="font-title-lg text-title-lg font-bold text-primary">Safe Park</h1>
+            <p class="font-body-md text-body-md text-secondary mt-1">Smart Apartment Parking</p>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="flex flex-col h-full py-lg px-md gap-sm overflow-y-auto">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="{{ route('dashboard') }}">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-title-md text-title-md">Beranda</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('pemesanan') }}">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="font-title-md text-title-md">Pemesanan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('kendaraan') }}">
+            <span class="material-symbols-outlined">garage</span>
+            <span class="font-title-md text-title-md">Kendaraan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('invite') }}">
+            <span class="material-symbols-outlined">person_add</span>
+            <span class="font-title-md text-title-md">Undang Tamu</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('profile.edit') }}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-title-md text-title-md">Profile</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
+            <span class="material-symbols-outlined">help</span>
+            <span class="font-title-md text-title-md">Bantuan</span>
+        </a>
+    </div>
+</nav>
+
+<!-- BACKDROP GELAP UNTUK MOBILE SIDEBAR -->
+<div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden transition-opacity"></div>
+
 <!-- MAIN CONTENT AREA -->
 <div class="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen">
     <!-- TOP NAVBAR -->
     <header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm sticky top-0 z-40">
         <div class="flex justify-between items-center w-full px-6 py-3">
-            <div class="md:hidden">
+            <div class="flex items-center gap-3 md:hidden">
+                <!-- Tombol Hamburger Menu Mobile -->
+                <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary focus:outline-none">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
                 <h1 class="text-lg font-bold text-primary">Safe Park</h1>
             </div>
             <div class="flex-1"></div>
@@ -208,7 +254,7 @@
                 </div>
             </div>
 
-            <!-- Current Parking Status Card (4 Cols) -->
+<!-- Current Parking Status Card (4 Cols) -->
             <div class="md:col-span-4 bg-surface rounded-xl p-6 border border-outline-variant shadow-sm flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-4">
@@ -217,7 +263,7 @@
                             <h3 class="font-bold text-on-background">Parkir Aktif</h3>
                         </div>
                         <span class="px-2.5 py-1 bg-blue-100 text-primary text-xs font-semibold rounded-full" id="val-area-name">
-                            {{ $parkiraktif->areaParkir->nama_area ?? 'Tower A' }}
+                            {{ $parkiraktif->areaParkir->nama_area ?? ($parkiraktif->area_parkir ?? 'Tower A') }}
                         </span>
                     </div>
 
@@ -231,13 +277,13 @@
                         <div class="flex justify-between items-center">
                             <span class="text-secondary">Plat Nomor</span>
                             <span class="text-on-background font-bold font-mono" id="val-nomor-plat">
-                                {{ $parkiraktif->nomor_plat ?? '-' }}
+                                {{ $parkiraktif->nomor_plat ?? ($parkiraktif->kendaraan->nomor_plat ?? '-') }}
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-secondary">Lokasi</span>
                             <span class="text-on-background font-bold" id="val-lokasi">
-                                {{ $parkiraktif->areaParkir->nama_area ?? '-' }}
+                                {{ $parkiraktif->areaParkir->nama_area ?? 'Slot Utama' }}
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
@@ -319,6 +365,15 @@
 
 <!-- REAL-TIME TIMER & STATS POLLING SCRIPT -->
 <script>
+// Fungsi untuk toggle (buka/tutup) sidebar mobile
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('mobile-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    
+    sidebar.classList.toggle('-translate-x-full');
+    backdrop.classList.toggle('hidden');
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     // 1. Timer Durasi Parkir Real-Time
     const waktuMasukStr = "{{ $parkiraktif && $parkiraktif->waktu_masuk ? \Carbon\Carbon::parse($parkiraktif->waktu_masuk)->toIso8601String() : '' }}";

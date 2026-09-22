@@ -70,10 +70,27 @@ class PaymentController extends Controller
             if ($transaction == 'settlement' || $transaction == 'capture') {
                 $statusPayment->update(['status' => 'berhasil']);
                 if ($statusPayment->pemesanan) {
-                    $statusPayment->pemesanan->update(['status' => 'aktif']);
+                    $pemesanan = $statusPayment->pemesanan;
+                    if ($pemesanan->status === 'aktif') {
+                        $durasiBaru = match ((int) $statusPayment->amount) {
+                            3600000 => '12 Bulan (1 Tahun)',
+                            2100000 => '6 Bulan',
+                            400000  => '1 Bulan',
+                            default => '1 Bulan',
+                        };
+                        $pemesanan->update([
+                            'durasi' => $pemesanan->durasi . ' + ' . $durasiBaru,
+                        ]);
+                    } else {
+                        $pemesanan->update(['status' => 'aktif']);
+                    }
                 }
-                if ($statusPayment->slotParkir) {
-                    $statusPayment->slotParkir->update(['status' => 'dipesan']);
+                
+                // Jangan timpa jika slot sudah terisi
+                if ($statusPayment->slotParkir && $statusPayment->slotParkir->status !== 'terisi') {
+                    $statusPayment->slotParkir()->update([
+                        'status' => 'dipesan'
+                    ]);
                 }
             } elseif ($transaction == 'pending') {
                 $statusPayment->update(['status' => 'pending']);
@@ -83,8 +100,10 @@ class PaymentController extends Controller
                 if ($statusPayment->pemesanan) {
                     $statusPayment->pemesanan->update(['status' => 'batal']);
                 }
-                if ($statusPayment->slotParkir) {
-                    $statusPayment->slotParkir->update(['status' => 'tersedia']);
+                if ($statusPayment->slotParkir && $statusPayment->slotParkir->status !== 'terisi') {
+                    $statusPayment->slotParkir()->update([
+                        'status' => 'tersedia'
+                    ]);
                 }
             }
 
@@ -103,18 +122,37 @@ class PaymentController extends Controller
 
         if ($status === 'berhasil') {
             if ($payment->pemesanan) {
-                $payment->pemesanan->update(['status' => 'aktif']);
+                $pemesanan = $payment->pemesanan;
+                if ($pemesanan->status === 'aktif') {
+                    $durasiBaru = match ((int) $payment->amount) {
+                        3600000 => '12 Bulan (1 Tahun)',
+                        2100000 => '6 Bulan',
+                        400000  => '1 Bulan',
+                        default => '1 Bulan',
+                    };
+                    $pemesanan->update([
+                        'durasi' => $pemesanan->durasi . ' + ' . $durasiBaru,
+                    ]);
+                } else {
+                    $pemesanan->update(['status' => 'aktif']);
+                }
             }
-            if ($payment->slotParkir) {
-                $payment->slotParkir->update(['status' => 'dipesan']);
+            
+            // Jangan timpa jika slot sudah terisi
+            if ($payment->slotParkir && $payment->slotParkir->status !== 'terisi') {
+                $payment->slotParkir()->update([
+                    'status' => 'dipesan'
+                ]);
             }
         } else {
             // Jika GAGAL
             if ($payment->pemesanan) {
                 $payment->pemesanan->update(['status' => 'batal']);
             }
-            if ($payment->slotParkir) {
-                $payment->slotParkir->update(['status' => 'tersedia']);
+            if ($payment->slotParkir && $payment->slotParkir->status !== 'terisi') {
+                $payment->slotParkir()->update([
+                    'status' => 'tersedia'
+                ]);
             }
         }
 
@@ -124,28 +162,41 @@ class PaymentController extends Controller
     // Method bayar tanpa midtrans (Simulasi UKK)
     public function simulasiSukses($id)
     {
-        $payment = StatusPayment::findOrFail($id);
+        $payment = StatusPayment::with(['pemesanan', 'slotParkir'])->findOrFail($id);
     
-        // 1. Ubah status pembayaran jadi 'berhasil'
         $payment->update([
             'status' => 'berhasil'
         ]);
     
-        // 2. Ubah status pemesanan jadi 'aktif'
-        if ($payment->pemesanan_id) {
-            Pemesanan::where('id', $payment->pemesanan_id)->update([
-                'status' => 'aktif'
-            ]);
+        if ($payment->pemesanan) {
+            $pemesanan = $payment->pemesanan;
+
+            if ($pemesanan->status === 'aktif') {
+                $durasiBaru = match ((int) $payment->amount) {
+                    3600000 => '12 Bulan (1 Tahun)',
+                    2100000 => '6 Bulan',
+                    400000  => '1 Bulan',
+                    default => '1 Bulan',
+                };
+
+                $pemesanan->update([
+                    'durasi' => $pemesanan->durasi . ' + ' . $durasiBaru,
+                ]);
+            } else {
+                $pemesanan->update([
+                    'status' => 'aktif'
+                ]);
+            }
         }
     
-        // 3. Slot parkir berubah jadi 'dipesan'
-        if ($payment->slot_parkir_id) {
-            SlotParkir::where('id', $payment->slot_parkir_id)->update([
+        // Jangan timpa jika slot sudah terisi
+        if ($payment->slotParkir && $payment->slotParkir->status !== 'terisi') {
+            $payment->slotParkir()->update([
                 'status' => 'dipesan'
             ]);
         }
     
-        return redirect()->route('payment.status', $payment->id)
+        return redirect()->route('pemesanan.status', $payment->id)
             ->with('success', 'Pembayaran berhasil dikonfirmasi!');
     }
 
@@ -163,9 +214,9 @@ class PaymentController extends Controller
             ]);
         }
 
-        // 3. Update status slot parkir jadi 'tersedia'
-        if ($payment->slot_parkir_id) {
-            SlotParkir::where('id', $payment->slot_parkir_id)->update([
+        // 3. Update status slot parkir jadi 'tersedia' (hanya jika tidak terisi)
+        if ($payment->slotParkir && $payment->slotParkir->status !== 'terisi') {
+            $payment->slotParkir()->update([
                 'status' => 'tersedia'
             ]);
         }

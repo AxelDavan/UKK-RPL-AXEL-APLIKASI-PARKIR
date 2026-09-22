@@ -116,7 +116,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/kendaraan/real-time', [KendaraanOwnerController::class, 'getStatus'])->name('kendaraan.realtime');
 
     Route::get('/api/kendaraan/unassigned', [KendaraanOwnerController::class, 'getUnassignedVehicles'])->name('kendaraan.unassigned');
-    Route::delete('/kendaraan/{id}', [KendaraanOwnerController::class, 'destroy'])->name('kendaraanowner.destroy');
+    Route::delete('/kendaraan-owner/{id}', [KendaraanOwnerController::class, 'destroy'])->name('kendaraanowner.destroy');
     Route::get('/user/myslots', [KendaraanOwnerController::class, 'getMySlot'])->name('kendaraan.myslot');
     Route::post('/kendaraan/store', [KendaraanOwnerController::class, 'store'])->name('kendaraan.store.ajax');
 
@@ -131,6 +131,11 @@ Route::middleware(['auth'])->group(function () {
     
     return view('dashboard.owner.kartu', compact('kendaraan'));
     })->name('kartu');
+
+    Route::get('/Kode-booking', [PemesananController::class, 'daftarKode'])->name('kode');
+    Route::get('/pembayaran/pemesanan-status/{id}', [PemesananController::class, 'status'])->name('pemesanan.status');
+    Route::get('/karcis-detail/{id}', [PemesananController::class, 'detailKarcis'])->name('karcis.detail');
+    Route::post('/pemesanan/perpanjang/{id}', [PemesananController::class, 'perpanjang'])->name('pemesanan.perpanjang');
 
 });
 

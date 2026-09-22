@@ -145,11 +145,61 @@
     </div>
 </nav>
 
+<!-- SIDEBAR MOBILE (Drawer tersembunyi yang bisa dibuka lewat tombol menu) -->
+<nav id="mobile-sidebar" class="bg-surface border-r border-outline-variant h-screen w-64 fixed left-0 top-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col md:hidden">
+    <div class="p-lg flex justify-between items-center">
+        <div>
+            <h1 class="font-title-lg text-title-lg font-bold text-primary">Safe Park</h1>
+            <p class="font-body-md text-body-md text-secondary mt-1">Smart Apartment Parking</p>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="flex flex-col h-full py-lg px-md gap-sm overflow-y-auto">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('dashboard') }}">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-title-md text-title-md">Beranda</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('pemesanan') }}">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="font-title-md text-title-md">Pemesanan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="{{ route('kendaraan') }}">
+            <span class="material-symbols-outlined">garage</span>
+            <span class="font-title-md text-title-md">Kendaraan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('invite') }}">
+            <span class="material-symbols-outlined">person_add</span>
+            <span class="font-title-md text-title-md">Undang Tamu</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('profile.edit') }}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-title-md text-title-md">Profile</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
+            <span class="material-symbols-outlined">help</span>
+            <span class="font-title-md text-title-md">Bantuan</span>
+        </a>
+    </div>
+</nav>
+
+<!-- BACKDROP GELAP UNTUK MOBILE SIDEBAR -->
+<div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden transition-opacity"></div>
+
+
 <!-- Main Content Canvas -->
 <main class="flex-1 md:ml-64 w-full md:w-[calc(100%-16rem)] min-h-screen flex flex-col relative">
     <header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm docked full-width top-0 sticky z-40">
         <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-sm">
             <div class="md:hidden flex items-center gap-sm">
+                <div class="flex items-center gap-3 md:hidden">
+                <!-- Tombol Hamburger Menu Mobile -->
+                <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary focus:outline-none">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+                <h1 class="text-lg font-bold text-primary"></h1>
+            </div>
                 <span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Safe Park</span>
             </div>
             <div class="hidden md:block flex-1"></div>
@@ -240,20 +290,23 @@
                                 </div>
 
                                 <!-- Tombol Hapus Langsung -->
-                                <button type="button" 
+                               <button type="button" 
                                         onclick="if(confirm('Yakin ingin menghapus kendaraan ${plat}?')) { 
-                                            fetch('/kendaraan-owner/' + k.id, {
+                                            fetch('/kendaraan-owner/' + ${k.id}, {
                                                 method: 'DELETE',
                                                 headers: {
                                                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                                     'Accept': 'application/json'
                                                 }
-                                            }).then(res => res.json()).then(data => {
-                                                if(data.success) {
-                                                    // Data akan otomatis diperbarui oleh polling berikutnya
+                                            }).then(res => res.json()).then(d => {
+                                                if(d.success) {
+                                                    // Berhasil dihapus, polling akan otomatis memperbarui tampilan
                                                 } else {
                                                     alert('Gagal menghapus kendaraan.');
                                                 }
+                                            }).catch(err => {
+                                                console.error(err);
+                                                alert('Terjadi kesalahan jaringan.');
                                             });
                                         }"
                                         class="flex items-center gap-1 bg-error/10 hover:bg-error text-error hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border border-error/20 shadow-sm active:scale-95">
@@ -530,6 +583,14 @@
                     select.innerHTML = '<option value="">Semua kendaraan sudah memiliki slot</option>';
                 }
             });
+    }
+
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('mobile-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        
+        sidebar.classList.toggle('-translate-x-full');
+        backdrop.classList.toggle('hidden');
     }
 
     // Kirim Data via Real-Time AJAX (Tanpa Reload)

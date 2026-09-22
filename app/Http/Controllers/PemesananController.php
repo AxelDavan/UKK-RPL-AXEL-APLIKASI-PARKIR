@@ -8,6 +8,7 @@ use App\Models\Pemesanan;
 use App\Models\SlotParkir;
 use App\Models\StatusPayment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PemesananController extends Controller
 {
@@ -47,20 +48,32 @@ class PemesananController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validasi input (kendaraan_id dibuat nullable / tidak wajib)
+        // 1. Validasi input
         $request->validate([
             'slot_parkir_id' => 'required|exists:slot_parkirs,id',
-            'kendaraan_id'   => 'nullable|exists:kendaraans,id', // BISA KOSONG SAAT BELI SLOT
+            'kendaraan_id'   => 'nullable|exists:kendaraans,id',
             'tanggal_mulai'  => 'required|date',
             'durasi'         => 'required|string',
             'tipe_booking'   => 'required|string',
         ]);
 
+        // Ambil data slot parkir untuk mendapatkan kode 
+        $slotParkir = SlotParkir::findOrFail($request->slot_parkir_id);
+        $kodeAsli = $slotParkir->kode_slot;
+
+        // Pisahkan huruf depan dan nomor slot
+        $parts = explode('-', $kodeAsli);
+        $hurufAwal = $parts[0];
+        $nomorSlot = $parts[1] ?? '01';
+
+        $tanggalHariIni = date('Ymd');
+        $kodeBookingDinamis = strtoupper($hurufAwal) . '-' . $tanggalHariIni . '-' . $nomorSlot;
+
         // 2. Simpan data Pemesanan
         $pemesanan = Pemesanan::create([
             'user_id'        => auth()->id(),
             'slot_parkir_id' => $request->slot_parkir_id,
-            'kendaraan_id'   => $request->kendaraan_id ?? null, // Isikan NULL jika belum ada kendaraan
+            'kendaraan_id'   => $request->kendaraan_id ?? null,
             'tanggal_mulai'  => $request->tanggal_mulai,
             'durasi'         => $request->durasi,
             'tipe_booking'   => $request->tipe_booking,
@@ -68,26 +81,37 @@ class PemesananController extends Controller
             'status'         => 'pending',
         ]);
 
-        // 3. Hitung nominal berdasarkan durasi yang dipilih
-        $amount = match ($request->durasi) {
-            '12 Bulan (1 Tahun)' => 3600000,
-            '6 Bulan'            => 2100000,
-            '1 Bulan'            => 400000,
-            'Permanen Unit'      => 15000000,
-            default              => 3600000,
-        };
+        // 3. Cek apakah slot yang dipilih adalah VIP (Harga Khusus)
+        $isVip = str_starts_with(strtoupper($kodeAsli), 'VIP');
+
+        if ($isVip) {
+            $amount = match ($request->durasi) {
+                '12 Bulan (1 Tahun)' => 5000000,
+                '6 Bulan'            => 3000000,
+                '1 Bulan'            => 600000,
+                'Permanen Unit'      => 20000000,
+                default              => 5000000,
+            };
+        } else {
+            $amount = match ($request->durasi) {
+                '12 Bulan (1 Tahun)' => 3600000,
+                '6 Bulan'            => 2100000,
+                '1 Bulan'            => 400000,
+                'Permanen Unit'      => 15000000,
+                default              => 3600000,
+            };
+        }
 
         // 4. Simpan ke database pembayaran
         $payment = StatusPayment::create([
             'user_id'        => auth()->id(),
             'pemesanan_id'   => $pemesanan->id,
             'slot_parkir_id' => $request->slot_parkir_id,
-            'order_id'       => 'SP-' . date('Ymd') . '-' . rand(100, 999),
-            'amount'         => $amount,
+            'order_id'       => $kodeBookingDinamis,
+            'amount'         => (int) $amount,
             'status'         => 'pending',
         ]);
 
-        // 6. Redirect user langsung ke halaman pembayaran
         return redirect()->route('payment', $payment->id);
     }
 
@@ -116,16 +140,123 @@ class PemesananController extends Controller
         $payment = StatusPayment::with(['pemesanan', 'slotParkir'])->findOrFail($id);
 
         if ($payment->status === 'berhasil') {
-            $payment->pemesanan()->update([
-                'status' => 'aktif'
-            ]);
+            $pemesanan = $payment->pemesanan;
 
-            $payment->slotParkir()->update([
-                'status' => 'dipesan'
-            ]);
+            if ($pemesanan) {
+                if ($pemesanan->status === 'aktif') {
+                    $durasiBaru = match ((int) $payment->amount) {
+                        5000000, 3600000 => '12 Bulan (1 Tahun)',
+                        3000000, 2100000 => '6 Bulan',
+                        600000, 400000   => '1 Bulan',
+                        default          => '1 Bulan',
+                    };
+
+                    $pemesanan->update([
+                        'durasi' => $pemesanan->durasi . ' + ' . $durasiBaru,
+                    ]);
+                } else {
+                    $pemesanan->update([
+                        'status' => 'aktif'
+                    ]);
+                }
+            }
+
+            if ($payment->slotParkir && $payment->slotParkir->status !== 'terisi') {
+                $payment->slotParkir()->update([
+                    'status' => 'dipesan'
+                ]);
+            }
         }
 
         $statuspayment = $payment;
-        return view('payment.status', compact('statuspayment'));
+        
+        return view('payment.status', compact('payment', 'statuspayment'));
+    }
+
+    public function daftarKode()
+    {
+        $user = Auth()->user();
+
+        $pemesanans = Pemesanan::with(['slotParkir', 'areaParkir', 'kendaraan'])
+        ->where('user_id', $user->id)
+        ->latest()
+        ->get();
+
+        return view('dashboard.owner.kode', compact('user', 'pemesanans'));
+    }
+
+    public function detailKarcis($id)
+    {
+        $user = auth()->user();
+        
+        $pemesanan = Pemesanan::with(['slotParkir.areaParkir', 'kendaraan', 'statusPayment'])
+            ->where('user_id', $user->id)
+            ->findOrFail($id);
+
+        $kodeBooking = optional($pemesanan->statusPayment)->order_id;
+        if (!$kodeBooking && $pemesanan->slotParkir) {
+            $parts = explode('-', $pemesanan->slotParkir->kode_slot);
+            $huruf = $parts[0] ?? 'A';
+            $nomor = $parts[1] ?? '01';
+            $tanggal = \Carbon\Carbon::parse($pemesanan->created_at)->format('Ymd');
+            $kodeBooking = strtoupper($huruf) . '-' . $tanggal . '-' . $nomor;
+        } elseif (!$kodeBooking) {
+            $kodeBooking = 'SP-' . $pemesanan->id;
+        }
+
+        return view('dashboard.owner.karcis-detail', compact('user', 'pemesanan', 'kodeBooking'));
+    }
+
+    public function perpanjang(Request $request, $id)
+    {
+        $request->validate([
+            'durasi_perpanjangan' => 'required|string',
+        ]);
+
+        $user = auth()->user();
+        $pemesanan = Pemesanan::with('statusPayment', 'slotParkir')->where('user_id', $user->id)->findOrFail($id);
+
+        $tambahDurasi = $request->durasi_perpanjangan;
+        $slotParkir = $pemesanan->slotParkir;
+        
+        // Cek apakah slot yang diperpanjang merupakan VIP (Harga Khusus)
+        $isVip = $slotParkir ? str_starts_with(strtoupper($slotParkir->kode_slot), 'VIP') : false;
+
+        if ($isVip) {
+            $amount = match ($tambahDurasi) {
+                '12 Bulan (1 Tahun)' => 5000000,
+                '6 Bulan'            => 3000000,
+                '1 Bulan'            => 600000,
+                default              => 600000,
+            };
+        } else {
+            $amount = match ($tambahDurasi) {
+                '12 Bulan (1 Tahun)' => 3600000,
+                '6 Bulan'            => 2100000,
+                '1 Bulan'            => 400000,
+                default              => 400000,
+            };
+        }
+
+        $kodeBookingPaten = optional($pemesanan->statusPayment)->order_id;
+        if (!$kodeBookingPaten && $slotParkir) {
+            $parts = explode('-', $slotParkir->kode_slot);
+            $huruf = $parts[0] ?? 'A';
+            $nomor = $parts[1] ?? '01';
+            $tanggal = \Carbon\Carbon::parse($pemesanan->created_at)->format('Ymd');
+            $kodeBookingPaten = strtoupper($huruf) . '-' . $tanggal . '-' . $nomor;
+        }
+
+        $payment = StatusPayment::create([
+            'user_id'        => $user->id,
+            'pemesanan_id'   => $pemesanan->id,
+            'slot_parkir_id' => $pemesanan->slot_parkir_id,
+            'order_id'       => $kodeBookingPaten, 
+            'amount'         => (int) $amount,
+            'status'         => 'pending',
+            'catatan'        => 'Perpanjangan: ' . $tambahDurasi
+        ]);
+
+        return redirect()->route('payment', $payment->id);
     }
 }

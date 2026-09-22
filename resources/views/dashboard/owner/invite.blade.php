@@ -151,8 +151,61 @@
     </div>
   </nav>
 
+<nav id="mobile-sidebar" class="bg-surface border-r border-outline-variant h-screen w-64 fixed left-0 top-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col md:hidden">
+    <div class="p-lg flex justify-between items-center">
+        <div>
+            <h1 class="font-title-lg text-title-lg font-bold text-primary">Safe Park</h1>
+            <p class="font-body-md text-body-md text-secondary mt-1">Smart Apartment Parking</p>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="flex flex-col h-full py-lg px-md gap-sm overflow-y-auto">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('dashboard') }}">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-title-md text-title-md">Beranda</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('pemesanan') }}">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="font-title-md text-title-md">Pemesanan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('kendaraan') }}">
+            <span class="material-symbols-outlined">garage</span>
+            <span class="font-title-md text-title-md">Kendaraan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="{{ route('invite') }}">
+            <span class="material-symbols-outlined">person_add</span>
+            <span class="font-title-md text-title-md">Undang Tamu</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('profile.edit') }}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-title-md text-title-md">Profile</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
+            <span class="material-symbols-outlined">help</span>
+            <span class="font-title-md text-title-md">Bantuan</span>
+        </a>
+    </div>
+</nav>
+
+<!-- BACKDROP GELAP UNTUK MOBILE SIDEBAR -->
+<div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden transition-opacity"></div>
+
   <!-- MAIN CONTENT -->
   <main class="flex-1 flex flex-col min-w-0 pb-16 overflow-y-auto md:ml-64">
+    <header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm sticky top-0 z-40">
+        <div class="flex justify-between items-center w-full px-6 py-3">
+            <div class="flex items-center gap-3 md:hidden">
+                <!-- Tombol Hamburger Menu Mobile -->
+                <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary focus:outline-none">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+                <h1 class="text-lg font-bold text-primary">Safe Park</h1>
+            </div>
+            <div class="flex-1"></div>
+        </div>
+    </header>
     <div class="px-6 lg:px-10 pt-8 max-w-7xl w-full mx-auto space-y-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
@@ -489,6 +542,15 @@
                 btnText.innerText = "Salin Tautan Akses Tamu";
             }, 2000);
         });
+    }
+
+    // Fungsi untuk toggle (buka/tutup) sidebar mobile
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('mobile-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
+        sidebar.classList.toggle('-translate-x-full');
+        backdrop.classList.toggle('hidden');
     }
   </script>
 

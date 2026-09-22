@@ -142,12 +142,65 @@
     </div>
 </nav>
 
+<nav id="mobile-sidebar" class="bg-surface border-r border-outline-variant h-screen w-64 fixed left-0 top-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col md:hidden">
+    <div class="p-lg flex justify-between items-center">
+        <div>
+            <h1 class="font-title-lg text-title-lg font-bold text-primary">Safe Park</h1>
+            <p class="font-body-md text-body-md text-secondary mt-1">Smart Apartment Parking</p>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="flex flex-col h-full py-lg px-md gap-sm overflow-y-auto">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('dashboard') }}">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-title-md text-title-md">Beranda</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="{{ route('pemesanan') }}">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="font-title-md text-title-md">Pemesanan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('kendaraan') }}">
+            <span class="material-symbols-outlined">garage</span>
+            <span class="font-title-md text-title-md">Kendaraan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('invite') }}">
+            <span class="material-symbols-outlined">person_add</span>
+            <span class="font-title-md text-title-md">Undang Tamu</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('profile.edit') }}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-title-md text-title-md">Profile</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
+            <span class="material-symbols-outlined">help</span>
+            <span class="font-title-md text-title-md">Bantuan</span>
+        </a>
+    </div>
+</nav>
+
+<!-- BACKDROP GELAP UNTUK MOBILE SIDEBAR -->
+<div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden transition-opacity"></div>
+
 <!-- MAIN CONTENT AREA -->
 <div class="flex-1 flex flex-col w-full md:ml-64">
-    <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-40 border-b border-outline-variant shadow-sm flex justify-between items-center w-full px-6 py-3">
-        <h2 class="text-lg font-bold text-primary md:hidden">Safe Park</h2>
-        <div class="flex items-center gap-2 ml-auto">
-            
+<header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm docked full-width top-0 sticky z-40">
+        <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-sm">
+            <div class="md:hidden flex items-center gap-sm">
+                <div class="flex items-center gap-3 md:hidden">
+                <!-- Tombol Hamburger Menu Mobile -->
+                <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary focus:outline-none">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+                <h1 class="text-lg font-bold text-primary"></h1>
+            </div>
+                <span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Safe Park</span>
+            </div>
+            <div class="hidden md:block flex-1"></div>
+            <div class="flex items-center gap-sm">
+                
+            </div>
         </div>
     </header>
 
@@ -168,11 +221,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             <div class="lg:col-span-4 flex flex-col gap-6">
-                <!-- Active Booking Card -->
+                <!-- Active Booking / Kode Booking Card -->
                 <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant shadow-sm relative overflow-hidden">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <span class="text-xs text-primary font-bold uppercase tracking-wider block mb-1">Pemesanan Aktif</span>
+                            <span class="text-xs text-primary font-bold uppercase tracking-wider block mb-1">Slot & Kode Booking Aktif</span>
                             <h3 class="text-lg font-bold text-on-surface">
                                 {{ $pemesananAktif ? ($pemesananAktif->slotParkir->areaParkir->nama_area ?? 'Tower A') . ', Slot ' . ($pemesananAktif->slotParkir->kode_slot ?? '-') : 'Belum Ada Pemesanan' }}
                             </h3>
@@ -185,8 +238,12 @@
                     @if($pemesananAktif)
                         <div class="space-y-3 text-sm text-secondary mb-6">
                             <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">confirmation_number</span>
+                                <span class="font-mono font-semibold text-primary">ID: {{ optional($payment)->order_id ?? 'SP-BOOKING-01' }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-base">calendar_month</span>
-                                <span>{{ $pemesananAktif->tanggal_mulai ? $pemesananAktif->tanggal_mulai->format('d M Y') : '-' }} - {{ $pemesananAktif->tanggal_selesai ? $pemesananAktif->tanggal_selesai->format('d M Y') : '-' }}</span>
+                                <span>Mulai: {{ $pemesananAktif->tanggal_mulai ? $pemesananAktif->tanggal_mulai->format('d M Y') : '-' }}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-base">directions_car</span>
@@ -200,16 +257,16 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-base">assignment</span>
-                                <span>Tipe: {{ $pemesananAktif->tipe_booking }}</span>
+                                <span>Paket: {{ $pemesananAktif->tipe_booking }}</span>
                             </div>
                         </div>
                     @else
                         <p class="text-xs text-secondary mb-6">Anda belum memiliki alokasi slot parkir berlangganan aktif.</p>
                     @endif
 
-                    <button class="w-full bg-primary text-white font-semibold py-2.5 rounded-lg hover:opacity-90 transition-opacity" onclick="document.getElementById('modal-buat-pemesanan').classList.remove('hidden')">
-                        Pesan Slot Baru
-                    </button>
+                    <a href="{{ route('kode') }}" class="w-full bg-primary text-white py-2.5 rounded-lg font-semibold hover:opacity-90 transition-opacity text-center block">
+                        Lihat Semua Kode Booking
+                    </a>
                 </div>
 
                 <!-- Card Detail Harga Durasi Langganan -->
@@ -263,7 +320,7 @@
                 </div>
             </div>
 
-            <!-- Peta Slot Parkir -->
+            <!-- Peta Slot Parkir (Dipisah Berdasarkan Lantai/Area) -->
             <div class="lg:col-span-8 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant shadow-sm flex flex-col">
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                     <div>
@@ -279,29 +336,113 @@
                     </div>
                 </div>
 
-                <div class="flex-1 bg-surface-container rounded-xl p-6 min-h-[350px]">
-                    <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-[555px] overflow-y-auto" id="grid-slot-parkir">
-                        @forelse($slotParkir as $slot)
-                            @php
-                                $statusClass = match($slot->status) {
-                                    'terisi' => 'bg-red-100 border-red-300 text-red-600 cursor-not-allowed',
-                                    'dipesan' => 'bg-amber-100 border-amber-300 text-amber-700 cursor-not-allowed',
-                                    default => 'bg-surface-container-lowest border-outline-variant text-on-surface hover:border-primary cursor-pointer',
-                                };
-                            @endphp
-                            <div 
-                                class="h-10 rounded border flex items-center justify-center text-xs font-bold font-mono transition-all slot-item {{ $statusClass }}"
-                                data-id="{{ $slot->id }}"
-                                data-kode="{{ $slot->kode_slot }}"
-                                data-status="{{ $slot->status }}"
-                                onclick="selectSlotMap(this)"
-                            >
-                                {{ $slot->kode_slot }}
-                            </div>
-                        @empty
-                            <p class="col-span-full text-center text-xs text-secondary py-8">Belum ada data slot parkir.</p>
-                        @endforelse
+                <div class="flex-1 bg-surface-container rounded-xl p-6 min-h-[350px] max-h-[580px] overflow-y-auto space-y-6" id="grid-slot-parkir">
+                    
+                    <!-- KODE A: LANTAI 1 -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-primary text-sm">layers</span>
+                            <h4 class="text-sm font-bold text-on-surface">Lantai 1 (Kode A)</h4>
+                        </div>
+                        <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                            @php $hasA = false; @endphp
+                            @foreach($slotParkir as $slot)
+                                @if(str_starts_with($slot->kode_slot, 'A'))
+                                    @php 
+                                        $hasA = true;
+                                        $statusClass = match($slot->status) {
+                                            'terisi' => 'bg-red-100 border-red-300 text-red-600 cursor-not-allowed',
+                                            'dipesan' => 'bg-amber-100 border-amber-300 text-amber-700 cursor-not-allowed',
+                                            default => 'bg-surface-container-lowest border-outline-variant text-on-surface hover:border-primary cursor-pointer',
+                                        };
+                                    @endphp
+                                    <div 
+                                        class="h-10 rounded border flex items-center justify-center text-xs font-bold font-mono transition-all slot-item {{ $statusClass }}"
+                                        data-id="{{ $slot->id }}"
+                                        data-kode="{{ $slot->kode_slot }}"
+                                        data-status="{{ $slot->status }}"
+                                        onclick="selectSlotMap(this)"
+                                    >
+                                        {{ $slot->kode_slot }}
+                                    </div>
+                                @endif
+                            @endforeach
+                            @if(!$hasA)
+                                <p class="col-span-full text-xs text-secondary italic">Tidak ada slot untuk Lantai 1.</p>
+                            @endif
+                        </div>
                     </div>
+
+                    <!-- KODE B: LANTAI 2 -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-primary text-sm">layers</span>
+                            <h4 class="text-sm font-bold text-on-surface">Lantai 2 (Kode B)</h4>
+                        </div>
+                        <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                            @php $hasB = false; @endphp
+                            @foreach($slotParkir as $slot)
+                                @if(str_starts_with($slot->kode_slot, 'B'))
+                                    @php 
+                                        $hasB = true;
+                                        $statusClass = match($slot->status) {
+                                            'terisi' => 'bg-red-100 border-red-300 text-red-600 cursor-not-allowed',
+                                            'dipesan' => 'bg-amber-100 border-amber-300 text-amber-700 cursor-not-allowed',
+                                            default => 'bg-surface-container-lowest border-outline-variant text-on-surface hover:border-primary cursor-pointer',
+                                        };
+                                    @endphp
+                                    <div 
+                                        class="h-10 rounded border flex items-center justify-center text-xs font-bold font-mono transition-all slot-item {{ $statusClass }}"
+                                        data-id="{{ $slot->id }}"
+                                        data-kode="{{ $slot->kode_slot }}"
+                                        data-status="{{ $slot->status }}"
+                                        onclick="selectSlotMap(this)"
+                                    >
+                                        {{ $slot->kode_slot }}
+                                    </div>
+                                @endif
+                            @endforeach
+                            @if(!$hasB)
+                                <p class="col-span-full text-xs text-secondary italic">Tidak ada slot untuk Lantai 2.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- KODE VIP: BASEMENT -->
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="material-symbols-outlined text-amber-600 text-sm">stairs</span>
+                            <h4 class="text-sm font-bold text-on-surface">Basement (Area VIP - Premium Rate)</h4>
+                        </div>
+                        <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                            @php $hasVIP = false; @endphp
+                            @foreach($slotParkir as $slot)
+                                @if(str_starts_with($slot->kode_slot, 'VIP'))
+                                    @php 
+                                        $hasVIP = true;
+                                        $statusClass = match($slot->status) {
+                                            'terisi' => 'bg-red-100 border-red-300 text-red-600 cursor-not-allowed',
+                                            'dipesan' => 'bg-amber-100 border-amber-300 text-amber-700 cursor-not-allowed',
+                                            default => 'bg-surface-container-lowest border-amber-400 text-amber-900 hover:bg-amber-50 cursor-pointer',
+                                        };
+                                    @endphp
+                                    <div 
+                                        class="h-10 rounded border flex items-center justify-center text-xs font-bold font-mono transition-all slot-item {{ $statusClass }}"
+                                        data-id="{{ $slot->id }}"
+                                        data-kode="{{ $slot->kode_slot }}"
+                                        data-status="{{ $slot->status }}"
+                                        onclick="selectSlotMap(this)"
+                                    >
+                                        {{ $slot->kode_slot }}
+                                    </div>
+                                @endif
+                            @endforeach
+                            @if(!$hasVIP)
+                                <p class="col-span-full text-xs text-secondary italic">Tidak ada slot untuk Basement (VIP).</p>
+                            @endif
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -354,7 +495,7 @@
     </main>
 </div>
 
-<!-- MODAL FORM BUAT PEMESANAN (BERSIH TANPA SELEKSI KENDARAAN) -->
+<!-- MODAL FORM BUAT PEMESANAN -->
 <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" id="modal-buat-pemesanan">
     <div class="bg-surface-container-lowest max-w-lg w-full rounded-2xl shadow-2xl border border-outline-variant overflow-hidden flex flex-col my-auto">
         <div class="flex items-center justify-between p-6 border-b border-outline-variant">
@@ -391,8 +532,9 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-xs font-semibold text-secondary block mb-1">Tanggal Mulai</label>
-                    <input name="tanggal_mulai" class="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2 text-sm text-on-surface" type="date" value="{{ date('Y-m-d') }}" required/>
+                    <label class="text-xs font-semibold text-secondary block mb-1">Tanggal Mulai (Otomatis)</label>
+                    <input class="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2 text-sm text-on-surface text-secondary cursor-not-allowed font-mono" type="text" value="{{ date('d M Y') }}" disabled/>
+                    <input type="hidden" name="tanggal_mulai" value="{{ date('Y-m-d') }}">
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-secondary block mb-1">Durasi</label>
@@ -438,6 +580,16 @@ function selectDurationCard(el, durasiValue) {
     document.getElementById('modal-buat-pemesanan').classList.remove('hidden');
 }
 
+
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('mobile-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    
+    sidebar.classList.toggle('-translate-x-full');
+    backdrop.classList.toggle('hidden');
+}
+
+
 function selectSlotMap(el) {
     const status = el.getAttribute('data-status');
     const slotId = el.getAttribute('data-id');
@@ -446,7 +598,8 @@ function selectSlotMap(el) {
 
     document.querySelectorAll('.slot-item').forEach(item => {
         if (item.getAttribute('data-status') === 'tersedia' || item.getAttribute('data-status') === 'available') {
-            item.className = 'h-10 rounded border flex items-center justify-center text-xs font-bold font-mono transition-all slot-item bg-surface-container-lowest border-outline-variant text-on-surface hover:border-primary cursor-pointer';
+            const isVip = item.getAttribute('data-kode').startsWith('VIP');
+            item.className = `h-10 rounded border flex items-center justify-center text-xs font-bold font-mono transition-all slot-item ${isVip ? 'bg-surface-container-lowest border-amber-400 text-amber-900 hover:bg-amber-50' : 'bg-surface-container-lowest border-outline-variant text-on-surface hover:border-primary'} cursor-pointer`;
         }
     });
 

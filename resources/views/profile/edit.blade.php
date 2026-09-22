@@ -460,9 +460,59 @@
     </div>
 </nav>
 
+<nav id="mobile-sidebar" class="bg-surface border-r border-outline-variant h-screen w-64 fixed left-0 top-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col md:hidden">
+    <div class="p-lg flex justify-between items-center">
+        <div>
+            <h1 class="font-title-lg text-title-lg font-bold text-primary">Safe Park</h1>
+            <p class="font-body-md text-body-md text-secondary mt-1">Smart Apartment Parking</p>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    <div class="flex flex-col h-full py-lg px-md gap-sm overflow-y-auto">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('dashboard') }}">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+            <span class="font-title-md text-title-md">Beranda</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('pemesanan') }}">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="font-title-md text-title-md">Pemesanan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('kendaraan') }}">
+            <span class="material-symbols-outlined">garage</span>
+            <span class="font-title-md text-title-md">Kendaraan</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors" href="{{ route('invite') }}">
+            <span class="material-symbols-outlined">person_add</span>
+            <span class="font-title-md text-title-md">Undang Tamu</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="{{ route('profile.edit') }}">
+            <span class="material-symbols-outlined">person</span>
+            <span class="font-title-md text-title-md">Profile</span>
+        </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary hover:text-primary hover:bg-surface-container transition-colors mt-auto" href="{{ route('bantuan') }}">
+            <span class="material-symbols-outlined">help</span>
+            <span class="font-title-md text-title-md">Bantuan</span>
+        </a>
+    </div>
+</nav>
+
 <!-- Main Content Wrapper -->
 <div class="flex-1 flex flex-col w-full md:ml-64 min-h-screen pb-20 md:pb-0">
 <main class="flex-1 p-6 md:p-8 w-full max-w-6xl mx-auto space-y-6">
+    <header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm sticky top-0 z-40">
+        <div class="flex justify-between items-center w-full px-6 py-3">
+            <div class="flex items-center gap-3 md:hidden">
+                <!-- Tombol Hamburger Menu Mobile -->
+                <button onclick="toggleMobileSidebar()" class="text-secondary hover:text-primary focus:outline-none">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+                <h1 class="text-lg font-bold text-primary">Safe Park</h1>
+            </div>
+            <div class="flex-1"></div>
+        </div>
+    </header>
 
     <div class="mb-6">
         <h2 class="text-2xl md:text-3xl font-bold text-on-surface">Profile Saya</h2>
@@ -605,6 +655,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Fungsi untuk toggle (buka/tutup) sidebar mobile
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('mobile-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+
+        sidebar.classList.toggle('-translate-x-full');
+        backdrop.classList.toggle('hidden');
+    }
+</script>
 
 </body>
 </html>
