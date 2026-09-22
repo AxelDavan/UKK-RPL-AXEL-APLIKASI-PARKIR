@@ -21,7 +21,7 @@ class BantuanController extends Controller
 
         $chats = Chat::latest()->get();
 
-        return view('chat.index', compact('chats'));
+        return view('dashboard.owner.bantuan', compact('chats'));
     }
 
     // API untuk Ambil Pesan Terbaru (Real-time Polling)
