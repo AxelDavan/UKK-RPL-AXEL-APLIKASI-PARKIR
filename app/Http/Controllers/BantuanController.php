@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chat;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class BantuanController extends Controller
@@ -11,6 +12,16 @@ class BantuanController extends Controller
     public function index()
     {
         return view('dashboard.owner.bantuan');
+
+        $expiredTime = Carbon::now()->subMinutes(15);
+
+        Chat::where('created_at', ',', $expiredTime)
+        ->whereNull('reply')
+        ->delete();
+
+        $chats = Chat::latest()->get();
+
+        return view('chat.index', compact('chats'));
     }
 
     // API untuk Ambil Pesan Terbaru (Real-time Polling)

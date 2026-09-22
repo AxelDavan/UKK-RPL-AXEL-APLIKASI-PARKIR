@@ -134,7 +134,7 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-
+//Route Chat Owner
 Route::middleware(['auth'])->group(function () {
     Route::get('/owner/bantuan', [BantuanController::class, 'index'])->name('bantuan');
     Route::get('/owner/bantuan/get-chats', [BantuanController::class, 'getChats'])->name('bantuan.get');
