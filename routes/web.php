@@ -52,19 +52,17 @@ Route::middleware('auth')->group(function () {
 });
 
 // ROLE DASHBOARDS
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth',])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/chart-data', [DashboardController::class, 'chartdata']);
-    
-    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
     Route::get('/admin/dashboard/chart-data', [AdminDashboardController::class, 'chartdata']);
-    Route::get('/petugas/dashboard', [PetugasDashboardController::class, 'index'])->name('petugas.dashboard');
 
     Route::resource('users', UserController::class);
 });
 
 // PAYMENT ROUTES
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/payment/{id}', [PaymentController::class, 'index'])->name('payment');
     Route::post('/api/payment-trigger/{id}', [PaymentController::class, 'updateStatus'])->name('payment.trigger');
     Route::get('/simulasi-bayar-sukses/{id}', [PaymentController::class, 'simulasiSukses'])->name('simulasi.sukses');
@@ -78,7 +76,8 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/api/midtrans-webhook', [PaymentController::class, 'handleWebhook']);
 
 // ADMIN MANAGEMENT ROUTES
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/dashboard/admin/kendaraan1', [KendaaranAdminController::class, 'index'])->name('dashboard.admin.kendaraan1');
     Route::post('/dashboard/admin/kendaraan1', [KendaaranAdminController::class, 'store'])->name('kendaraan.store');
     Route::get('/dashboard/admin/kendaraan/{kendaraan}', [KendaaranAdminController::class, 'show'])->name('kendaraan.show');
@@ -103,7 +102,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // OWNER (RESIDEN) ROUTES
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/dashboard', [OwnerDashboardController::class, 'index'])->name('owner.dashboard');
     Route::get('/owner/kartu', [OwnerDashboardController::class, 'kartu'])->name('owner.kartu');
     Route::get('/owner/dashboard/stats', [OwnerDashboardController::class, 'stats'])->name('owner.dashboard.stats');
@@ -140,14 +139,14 @@ Route::middleware(['auth'])->group(function () {
 });
 
 //Route Chat Owner
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/bantuan', [BantuanController::class, 'index'])->name('bantuan');
     Route::get('/owner/bantuan/get-chats', [BantuanController::class, 'getChats'])->name('bantuan.get');
     Route::post('/owner/bantuan/kirim-chat', [BantuanController::class, 'kirimChat'])->name('bantuan.kirim');
 });
 
-// Route Chat Admin
-Route::middleware(['auth'])->group(function () {
+// Route Chat Petugas
+Route::middleware(['auth', 'role:petugas'])->group(function () {
     Route::get('/admin/bantuan', [BantuanController::class, 'adminIndex'])->name('admin.bantuan');
     Route::get('/admin/bantuan/users', [BantuanController::class, 'getAdminUsers'])->name('admin.bantuan.users');
     Route::get('/admin/bantuan/chats/{userId}', [BantuanController::class, 'getAdminChats'])->name('admin.bantuan.chats');
@@ -191,17 +190,8 @@ Route::get('/list-tamu-undangan', function (Request $request) {
     ));
 })->middleware('auth')->name('list');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/aktivitas', function () {
-        return view('dashboard.account.aktivitas');
-    })->name('aktivitas');
-    Route::get('/perangkat', function () {
-        return view('dashboard.account.perangkat');
-    })->name('perangkat');
-});
-
-// PETUGAS POS ROUTES & SCANNER QR
-Route::middleware(['auth'])->group(function() {
+// PETUGAS ROUTES & SCANNER QR
+Route::middleware(['auth', 'role:petugas'])->group(function() {
     Route::get('/petugas/parkir/masuk', [TransaksiParkirController::class, 'masuk'])->name('masuk');
     Route::post('/petugas/parkir/masuk', [TransaksiParkirController::class, 'storeMasuk'])->name('storeMasuk');
     Route::get('/petugas/parkir/keluar', [TransaksiParkirController::class, 'keluar'])->name('keluar');
