@@ -32,6 +32,13 @@ class KarcisMasukController extends Controller
         ));
     }
 
+     private function generateNomorKarcis()
+    {
+        $today = Carbon::today();
+        $countToday = KarcisMasuk::whereDate('created_at', $today)->count() + 1;
+        return 'A-' . str_pad($countToday, 5, '0', STR_PAD_LEFT);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -80,13 +87,6 @@ class KarcisMasukController extends Controller
 
         // REDIRECT LANGSUNG KE HALAMAN CETAK BLADE!
         return redirect()->route('karsuk.cetak', $karcis->id);
-    }
-
-    private function generateNomorKarcis()
-    {
-        $today = Carbon::today();
-        $countToday = KarcisMasuk::whereDate('created_at', $today)->count() + 1;
-        return 'A-' . str_pad($countToday, 5, '0', STR_PAD_LEFT);
     }
 
     public function cetak($id)

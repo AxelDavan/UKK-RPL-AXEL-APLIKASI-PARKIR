@@ -259,17 +259,6 @@
 <span class="font-title-lg text-title-lg font-bold text-primary dark:text-inverse-primary">Safe Park</span>
 <span class="font-body-md text-body-md text-on-surface-variant">© 2026 SafePark. All rights reserved by Axel Davan Prayoga - SMK N1 SANDEN.</span>
 </div>
-<div class="flex flex-col gap-3">
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">Produk</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">Perusahaan</a>
-</div>
-<div class="flex flex-col gap-3">
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">Dukungan</a>
-</div>
-<div class="flex flex-col gap-3">
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">Privasi</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary underline decoration-primary transition-all opacity-100 hover:opacity-80" href="#">Syarat &amp; Ketentuan</a>
-</div>
 </div>
 </footer>
 </body></html>

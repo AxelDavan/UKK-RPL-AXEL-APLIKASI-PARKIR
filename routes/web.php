@@ -210,11 +210,6 @@ Route::middleware(['auth', 'role:petugas'])->group(function() {
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
 
-    // TABEL TAMU UNTUK ADMIN/PETUGAS
-    Route::get('/tamu', [TamuController::class, 'index'])->name('tamu');
-    Route::post('/tamu/{id}/checkout', [TamuController::class, 'checkout'])->name('tamu.checkout');
-    Route::delete('/tamu/{id}', [TamuController::class, 'destroy'])->name('tamu.destroy');
-
     // KARCIS
     Route::prefix('petugas')->group(function () {
         Route::get('/karsuk', [KarcisMasukController::class, 'index'])->name('karsuk');
@@ -229,6 +224,13 @@ Route::middleware(['auth', 'role:petugas'])->group(function() {
         Route::get('/dashboard/stats', [PetugasDashboardController::class, 'stats'])->name('petugas.dashboard.stats');
         Route::post('/verifikasi/{id}', [PetugasDashboardController::class, 'verifikasi'])->name('petugas.verifikasi');
     });
+});
+
+Route::middleware(['auth', 'role:admin,petugas'])->group(function () {
+    // TABEL TAMU UNTUK ADMIN/PETUGAS
+    Route::get('/tamu', [TamuController::class, 'index'])->name('tamu');
+    Route::post('/tamu/{id}/checkout', [TamuController::class, 'checkout'])->name('tamu.checkout');
+    Route::delete('/tamu/{id}', [TamuController::class, 'destroy'])->name('tamu.destroy');
 });
 
 require __DIR__.'/auth.php';

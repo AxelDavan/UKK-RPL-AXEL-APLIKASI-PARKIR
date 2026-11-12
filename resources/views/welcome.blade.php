@@ -225,22 +225,7 @@
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaOc5SpaHZxlIY_zbE6c7InULvCi27mNW9ve2MRtKLMxDff-Ob7o5lGM8ZsS6dxpkf6k4exIyLOOjQbnJnKC40i3lWl-vQs4umG2bLyQCZp-ninD4bb6gR_HbP2_fC2E0s5z8jcuI5eS61_jOlTaEwxnUpKiXcyMeSbHBFydxsGsWDWLP7eE812ZYzuve-tAeEeLP0NOt9WJewCtVJXJaD8xZaql4e_jVzyFZhMOGyFdcBpUbW7STH_w"
         />
 
-        <!-- Overlay ketika hover -->
-        <div
-            class="absolute inset-0 flex items-center justify-center
-                   opacity-0 group-hover:opacity-100
-                   transition-opacity duration-300"
-        >
-            <div
-                class="w-20 h-20 rounded-full bg-primary/95
-                       text-white flex items-center justify-center
-                       shadow-2xl"
-            >
-                <span class="material-symbols-outlined text-[42px]">
-                    play_arrow
-                </span>
-            </div>
-        </div>
+        
 
     </button>
 
@@ -273,21 +258,11 @@
 <!-- Footer -->
 <footer class="bg-surface-container-lowest dark:bg-inverse-surface py-12 border-t border-outline-variant w-full">
 <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter-lg max-w-max-width mx-auto px-gutter-lg">
-<div>
+<div text-center md:text-left>
 <div class="font-title-lg text-title-lg font-bold text-primary dark:text-inverse-primary mb-4">Safe Park</div>
 <p class="font-body-md text-body-md text-on-surface-variant">© 2026 SafePark. All rights reserved by Axel Davan Prayoga - SMK N1 SANDEN</p>
 </div>
-<div class="flex flex-col gap-2">
-<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md transition-all hover:opacity-80" href="#">Produk</a>
-<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md transition-all hover:opacity-80" href="#">Perusahaan</a>
-</div>
-<div class="flex flex-col gap-2">
-<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md transition-all hover:opacity-80" href="#">Dukungan</a>
-<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md transition-all hover:opacity-80" href="#">Privasi</a>
-</div>
-<div class="flex flex-col gap-2">
-<a class="text-on-surface-variant hover:text-primary font-body-md text-body-md transition-all hover:opacity-80" href="#">Syarat &amp; Ketentuan</a>
-</div>
+
 <!-- VIDEO MODAL -->
 <div
     id="heroVideoModal"
